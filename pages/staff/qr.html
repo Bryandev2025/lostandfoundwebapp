@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Staff — QR Tools</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="grid cols-3">
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:900;">QR Tools</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Generate item QR codes and scan tokens to load item details.
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:800;">Tip</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                You can scan using a phone camera and paste the token/URL here.
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <div style="font-weight:900;">Staff Area</div>
+                                <div style="color:var(--muted); font-size:12px;">QR generation & scanning</div>
+                            </div>
+                            <button class="btn ghost" id="btnClear">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="grid cols-2" style="margin-top:16px;">
+
+                        <!-- Left: Generate QR -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Generate QR</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Enter an item ID to generate its QR code.
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px;">
+                                <input class="input" id="itemId" placeholder="Item ID (e.g., 12)" />
+                                <button class="btn primary" id="btnGenerate">Generate</button>
+                            </div>
+
+                            <div id="genState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div id="qrPreviewWrap" class="card" style="padding:14px; margin-top:14px; display:none;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:900;">QR Preview</div>
+                                        <div id="qrMeta" style="color:var(--muted); font-size:12px; margin-top:4px;">—
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                        <button class="btn ghost" id="btnOpenPng">Open PNG</button>
+                                        <button class="btn ghost" id="btnCopyToken">Copy Token</button>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top:12px; display:flex; justify-content:center;">
+                                    <img id="qrImg"
+                                        style="width:220px; height:220px; border-radius:16px; border:1px solid var(--border);" />
+                                </div>
+
+                                <div style="margin-top:12px; color:var(--muted); font-size:12px;" id="qrTokenLine">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Scan QR -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Scan QR</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Paste the QR token or full scan URL. The system will fetch the item details.
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px;">
+                                <input class="input" id="scanInput"
+                                    placeholder="Token or URL (e.g., abc123 or https://.../scan/abc123)" />
+                                <button class="btn primary" id="btnScan">Scan</button>
+                            </div>
+
+                            <div id="scanState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div id="scanResult" class="card" style="padding:14px; margin-top:14px; display:none;">
+                                <div
+                                    style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                                    <div>
+                                        <div id="rTitle" style="font-weight:900; font-size:16px;">—</div>
+                                        <div id="rSub" style="color:var(--muted); margin-top:6px;">—</div>
+                                    </div>
+                                    <button class="btn ghost" id="btnOpenItem">Open Item</button>
+                                </div>
+
+                                <div id="rMeta" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                                <div id="rImgWrap" style="margin-top:12px; display:none;">
+                                    <img id="rImg"
+                                        style="width:100%; height:260px; object-fit:cover; border-radius:14px; border:1px solid var(--border);" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api, API } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("staff", "admin");
+        mountSidebar("staff");
+        mountTopbar();
+
+        const itemIdEl = document.getElementById("itemId");
+        const btnGenerate = document.getElementById("btnGenerate");
+        const genState = document.getElementById("genState");
+
+        const qrPreviewWrap = document.getElementById("qrPreviewWrap");
+        const qrImg = document.getElementById("qrImg");
+        const qrMeta = document.getElementById("qrMeta");
+        const qrTokenLine = document.getElementById("qrTokenLine");
+        const btnOpenPng = document.getElementById("btnOpenPng");
+        const btnCopyToken = document.getElementById("btnCopyToken");
+
+        const scanInput = document.getElementById("scanInput");
+        const btnScan = document.getElementById("btnScan");
+        const scanState = document.getElementById("scanState");
+
+        const scanResult = document.getElementById("scanResult");
+        const rTitle = document.getElementById("rTitle");
+        const rSub = document.getElementById("rSub");
+        const rMeta = document.getElementById("rMeta");
+        const rImgWrap = document.getElementById("rImgWrap");
+        const rImg = document.getElementById("rImg");
+        const btnOpenItem = document.getElementById("btnOpenItem");
+
+        const btnClear = document.getElementById("btnClear");
+
+        let lastItemId = null;
+        let lastQrToken = null;
+
+        function clearAll() {
+            itemIdEl.value = "";
+            genState.textContent = "";
+            qrPreviewWrap.style.display = "none";
+            lastItemId = null;
+            lastQrToken = null;
+
+            scanInput.value = "";
+            scanState.textContent = "";
+            scanResult.style.display = "none";
+            rImgWrap.style.display = "none";
+        }
+
+        btnClear.addEventListener("click", clearAll);
+
+        function extractToken(input) {
+            const raw = (input || "").trim();
+            if (!raw) return null;
+
+            // If user pasted full URL like https://domain.test/api/scan/TOKEN or /scan/TOKEN
+            const match = raw.match(/\/scan\/([^/?#]+)/i);
+            if (match && match[1]) return match[1];
+
+            // Otherwise assume it's already a token
+            return raw;
+        }
+
+        async function openPng(itemId) {
+            // fetch blob because endpoint likely requires auth
+            const res = await api.get(`/items/${itemId}/qr.png`);
+            if (!(res instanceof Response)) return;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+        }
+
+        btnGenerate.addEventListener("click", async () => {
+            const itemId = itemIdEl.value.trim();
+            if (!itemId) return toast("Item ID is required.", "warn");
+
+            genState.textContent = "Generating QR...";
+            btnGenerate.disabled = true;
+
+            try {
+                const payload = await api.post(`/items/${itemId}/qr`, {});
+                // Expected response might be:
+                // { message, qr_token } or { item: { qr_token } }
+                const qrToken =
+                    payload.qr_token ??
+                    payload.item?.qr_token ??
+                    payload.data?.qr_token ??
+                    payload.data?.item?.qr_token;
+
+                lastItemId = itemId;
+                lastQrToken = qrToken ?? null;
+
+                // Preview image: show PNG endpoint
+                const res = await api.get(`/items/${itemId}/qr.png`);
+                if (res instanceof Response) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    qrImg.src = url;
+                }
+
+                qrMeta.textContent = `Item #${itemId}`;
+                qrTokenLine.textContent = lastQrToken ? `Token: ${lastQrToken}` : `Token: (not returned by API, preview still works)`;
+
+                qrPreviewWrap.style.display = "block";
+                genState.textContent = "QR generated successfully.";
+                toast("QR generated.", "success");
+
+            } catch (e) {
+                genState.textContent = "Failed to generate QR.";
+            } finally {
+                btnGenerate.disabled = false;
+            }
+        });
+
+        btnOpenPng.addEventListener("click", async () => {
+            if (!lastItemId) return toast("Generate a QR first.", "warn");
+            try {
+                await openPng(lastItemId);
+            } catch {
+                toast("Unable to open QR PNG.", "danger");
+            }
+        });
+
+        btnCopyToken.addEventListener("click", async () => {
+            if (!lastQrToken) return toast("No token available to copy.", "warn");
+            await navigator.clipboard.writeText(lastQrToken);
+            toast("Token copied.", "success");
+        });
+
+        btnScan.addEventListener("click", async () => {
+            const token = extractToken(scanInput.value);
+            if (!token) return toast("Enter a token or scan URL.", "warn");
+
+            scanState.textContent = "Scanning...";
+            btnScan.disabled = true;
+
+            try {
+                const payload = await api.get(`/scan/${encodeURIComponent(token)}`);
+
+                // Expected response might be:
+                // { item: {...} } or just {...}
+                const item = payload.item ?? payload.data ?? payload;
+
+                scanResult.style.display = "block";
+                rTitle.textContent = item.title ?? `Item #${item.id}`;
+                rSub.textContent = `${(item.type ?? "").toUpperCase()} • ${(item.status ?? "").toUpperCase()} • ${item.location ?? "—"}`;
+
+                rMeta.innerHTML = `
+          <div><b>Category:</b> ${item.category ?? "—"}</div>
+          <div><b>Brand:</b> ${item.brand ?? "—"}</div>
+          <div><b>Color:</b> ${item.color ?? "—"}</div>
+          <div style="margin-top:8px;"><b>Description:</b> ${item.description ?? "—"}</div>
+        `;
+
+                if (item.image_path) {
+                    rImgWrap.style.display = "block";
+                    rImg.src = `/storage/${item.image_path}`;
+                } else {
+                    rImgWrap.style.display = "none";
+                }
+
+                btnOpenItem.onclick = () => {
+                    // staff can open item in user view for now
+                    window.location.href = `/pages/user/item-show.html?id=${encodeURIComponent(item.id)}`;
+                };
+
+                scanState.textContent = "Scan complete.";
+                toast("Item loaded.", "success");
+
+            } catch (e) {
+                scanState.textContent = "Scan failed. Invalid token or item not found.";
+            } finally {
+                btnScan.disabled = false;
+            }
+        });
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

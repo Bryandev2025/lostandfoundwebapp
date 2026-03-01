@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
+    <title>Item Details</title>
+</head>
+
+<body>
+    <!-- Premium Navbar -->
+    <nav id="navbar"></nav>
+
+    <main class="web-main">
+        <div class="web-container" style="max-width: 1000px;">
+
+            <button class="web-btn web-btn-glass" style="margin-bottom: 24px; padding: 8px 16px; font-size: 0.9rem;"
+                onclick="history.back()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Feed
+            </button>
+
+            <div class="grid" style="grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;">
+
+                <!-- LEFT: Item Info -->
+                <div class="web-card" style="padding: 32px;">
+                    <div id="itemHeader">
+                        <div
+                            style="height: 32px; width: 60%; background: var(--card-border); border-radius: 4px; margin-bottom: 16px; animation: pulse 2s infinite;">
+                        </div>
+                    </div>
+
+                    <div id="itemImageWrap" style="margin-top: 24px; display: none;">
+                        <img id="itemImage"
+                            style="width: 100%; max-height: 400px; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: rgba(0,0,0,0.2);">
+                    </div>
+
+                    <div id="itemMeta" style="margin-top: 24px; font-size: 1.05rem; line-height: 1.6;"></div>
+                </div>
+
+                <!-- RIGHT: Claim panel -->
+                <div class="web-card" style="padding: 32px; position: sticky; top: 104px;">
+                    <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Claim this item</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5;">
+                        Provide proof details to verify ownership. Be as descriptive as possible.
+                    </p>
+
+                    <textarea id="proof" class="web-input"
+                        style="min-height: 120px; resize: vertical; margin-bottom: 16px;"
+                        placeholder="Describe identifying features, contents, scratches, unique marks, etc."></textarea>
+
+                    <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Upload
+                        Image Proof (Optional)</label>
+                    <input type="file" id="proofImage" class="web-input" style="padding: 10px; margin-bottom: 24px;"
+                        accept="image/png,image/jpeg,image/webp">
+
+                    <button class="web-btn web-btn-primary"
+                        style="width: 100%; justify-content: center; padding: 14px 24px; font-size: 1.05rem;"
+                        id="btnClaim">
+                        Submit Claim Request
+                    </button>
+
+                    <div id="claimState"
+                        style="margin-top: 16px; font-size: 0.95rem; text-align: center; color: var(--text-muted); min-height: 20px;">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { mountNavbar } from "/components/navbar.js";
+        import { requireAuth } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        mountNavbar();
+
+        const params = new URLSearchParams(window.location.search);
+        const itemId = params.get("id");
+
+        if (!itemId) {
+            toast("Invalid item ID", "danger");
+            window.location.href = "/pages/user/items.html";
+        }
+
+        const header = document.getElementById("itemHeader");
+        const meta = document.getElementById("itemMeta");
+        const imgWrap = document.getElementById("itemImageWrap");
+        const img = document.getElementById("itemImage");
+
+        const claimBtn = document.getElementById("btnClaim");
+        const claimState = document.getElementById("claimState");
+
+        let currentItem = null;
+
+        function badge(text, bg, color) {
+            return `<span style="padding: 6px 12px; border-radius: 999px; background: ${bg}; color: ${color}; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;">${text}</span>`;
+        }
+
+        function render(item) {
+            currentItem = item;
+
+            const badgeBg = item.status === "pending" ? "rgba(245,158,11,.15)" : item.status === "matched" ? "rgba(139,92,246,.15)" : item.status === "claimed" ? "rgba(16,185,129,.15)" : "rgba(255,255,255,.08)";
+            const badgeColor = item.status === "pending" ? "#fbbf24" : item.status === "matched" ? "#c084fc" : item.status === "claimed" ? "#34d399" : "#a1a1aa";
+            const typeBg = item.type === "lost" ? "rgba(239,68,68,.15)" : "rgba(59,130,246,.15)";
+            const typeColor = item.type === "lost" ? "#f87171" : "#60a5fa";
+
+            header.innerHTML = `
+                <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    ${badge(item.type.toUpperCase(), typeBg, typeColor)}
+                    ${badge(item.status.toUpperCase(), badgeBg, badgeColor)}
+                </div>
+                <h1 style="font-size: 2rem; margin-bottom: 8px;">${item.title}</h1>
+                <div style="display: flex; gap: 16px; color: var(--text-muted); font-size: 0.95rem; align-items: center;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        ${item.location ?? "Unknown Location"}
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        ${item.created_at ? new Date(item.created_at).toLocaleDateString() : "Just now"}
+                    </span>
+                </div>
+            `;
+
+            meta.innerHTML = `
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px; color: var(--text-muted);">Description</h3>
+                    <p style="margin: 0;">${item.description || "No detailed description provided."}</p>
+                </div>
+                
+                <div class="grid cols-2" style="gap: 16px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border);">
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Category</div>
+                        <div style="font-weight: 500;">${item.category || "—"}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Brand</div>
+                        <div style="font-weight: 500;">${item.brand || "—"}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Color</div>
+                        <div style="font-weight: 500;">${item.color || "—"}</div>
+                    </div>
+                </div>
+            `;
+
+            if (item.image_path) {
+                img.src = `/storage/${item.image_path}`;
+                imgWrap.style.display = "block";
+            }
+
+            if (item.status !== "pending") {
+                claimBtn.disabled = true;
+                claimBtn.style.opacity = "0.5";
+                claimBtn.style.cursor = "not-allowed";
+                claimState.innerHTML = "This item is not currently claimable.";
+            }
+        }
+
+        async function load() {
+            try {
+                const res = await api.get(`/items/${itemId}`);
+                render(res.item ?? res.data ?? res);
+            } catch (err) {
+                toast("Failed to load item", "danger");
+                header.innerHTML = "<h1 style='color: var(--danger)'>Item not found</h1>";
+            }
+        }
+
+        claimBtn.addEventListener("click", async () => {
+            if (!currentItem) return;
+
+            const proof = document.getElementById("proof").value.trim();
+            if (!proof) {
+                toast("Proof details are required to submit a claim.", "warn");
+                return;
+            }
+
+            claimBtn.disabled = true;
+            claimBtn.innerHTML = "Submitting...";
+            claimState.innerHTML = "";
+
+            try {
+                const claim = await api.post("/claims", {
+                    item_id: itemId,
+                    proof_details: proof
+                });
+
+                const claimId = claim.claim?.id ?? claim.data?.id;
+                const file = document.getElementById("proofImage").files[0];
+
+                if (file) {
+                    const fd = new FormData();
+                    fd.append("image", file);
+                    await api.postForm(`/claims/${claimId}/proof-image`, fd);
+                }
+
+                toast("Claim submitted successfully!", "success");
+                claimState.innerHTML = "<span style='color: var(--status-claimed-text)'>✓ Claim submitted successfully. You can track it in My Claims.</span>";
+                claimBtn.innerHTML = "Claim Submitted";
+
+                // Allow tracking redirect
+                setTimeout(() => window.location.href = "/pages/user/my-claims.html", 1500);
+
+            } catch (e) {
+                claimState.innerHTML = "<span style='color: var(--danger)'>Failed to submit claim.</span>";
+                claimBtn.disabled = false;
+                claimBtn.innerHTML = "Submit Claim Request";
+            }
+        });
+
+        load();
+
+        // Add a simple pulse animation for the skeleton loader
+        const style = document.createElement('style');
+        style.textContent = "@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }";
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

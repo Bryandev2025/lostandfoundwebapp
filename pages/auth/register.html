@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <title>Lost & Found — Register</title>
+</head>
+
+<body>
+    <div class="container" style="max-width:520px; padding-top:64px;">
+        <div class="card" style="padding:22px;">
+            <h2 style="margin:0 0 8px 0;">Create an account</h2>
+            <p style="margin:0 0 18px 0; color:var(--muted);">Fill out the details below to register.</p>
+
+            <form id="registerForm" class="grid" onsubmit="event.preventDefault();">
+                <div>
+                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Full
+                        Name</label>
+                    <input class="input" id="name" type="text" placeholder="John Doe" required style="width:100%;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Email</label>
+                    <input class="input" id="email" type="email" placeholder="john@example.com" required
+                        style="width:100%;">
+                </div>
+                <div>
+                    <label
+                        style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Password</label>
+                    <input class="input" id="password" type="password" placeholder="Min. 8 characters" required
+                        style="width:100%;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Confirm
+                        Password</label>
+                    <input class="input" id="password_confirmation" type="password" placeholder="Confirm your password"
+                        required style="width:100%;">
+                </div>
+
+                <button class="btn primary" id="btnRegister" style="margin-top:8px;">Sign Up</button>
+                <div style="text-align:center; margin-top:12px;">
+                    <a href="/pages/auth/login.html"
+                        style="color:var(--muted); text-decoration:none; font-size:14px;">Already have an account?
+                        Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { api } from "/core/api.js";
+        import { setAuth, getToken, redirectByRole } from "/core/auth.js";
+        import { toast } from "/components/toast.js";
+        import { ui } from "/core/ui.js";
+
+        // Redirect if already logged in
+        if (getToken()) {
+            redirectByRole();
+        }
+
+        document.getElementById("btnRegister").addEventListener("click", async () => {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const password_confirmation = document.getElementById("password_confirmation").value;
+
+            if (!name || !email || !password || !password_confirmation) {
+                toast("All fields are required.", "warn");
+                return;
+            }
+
+            if (password !== password_confirmation) {
+                toast("Passwords do not match.", "warn");
+                return;
+            }
+
+            ui.disable("#btnRegister", "Registering...");
+
+            try {
+                // Adjust route based on backend configuration. Standard laravel defaults to /auth/register or similar
+                const data = await api.post("/auth/register", {
+                    name,
+                    email,
+                    password,
+                    password_confirmation
+                });
+
+                setAuth(data.token, data.user);
+                toast("Registration successful. Welcome!", "success");
+
+                redirectByRole(data.user);
+
+            } catch (e) {
+                // api.js handles basic error messaging
+                ui.enable("#btnRegister");
+            }
+        });
+    </script>
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

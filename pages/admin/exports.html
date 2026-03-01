@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Admin — Exports</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="grid cols-3">
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:900;">Exports</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Download Excel/PDF reports for records and documentation.
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:800;">Optional Filters</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                If your backend supports query filters, they’ll be appended to export URLs.
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <select id="fType">
+                                    <option value="">All Types</option>
+                                    <option value="lost">Lost</option>
+                                    <option value="found">Found</option>
+                                </select>
+
+                                <select id="fStatus">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="matched">Matched</option>
+                                    <option value="claimed">Claimed</option>
+                                    <option value="archived">Archived</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <div style="font-weight:900;">Admin Only</div>
+                                <div style="color:var(--muted); font-size:12px;">Reports & exports</div>
+                            </div>
+                            <button class="btn ghost" id="btnClear">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="grid cols-2" style="margin-top:16px; align-items:start;">
+
+                        <!-- Items exports -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Items Report</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Export all items to Excel or PDF.
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="btn primary" id="btnItemsExcel">Download Excel</button>
+                                <button class="btn ghost" id="btnItemsPdf">Open PDF</button>
+                            </div>
+
+                            <div id="itemsState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div class="card" style="margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                                <div style="font-weight:800;">Notes</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    If filters don’t work yet, it will still export everything.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Claims exports -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Claims Report</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Export claims for auditing and release tracking.
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="btn primary" id="btnClaimsExcel">Download Excel</button>
+                                <button class="btn ghost" id="btnClaimsPdf">Open PDF</button>
+                            </div>
+
+                            <div id="claimsState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div class="card" style="margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                                <div style="font-weight:800;">If you don’t have claims export</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    Buttons will show a warning — you can still pass defense with Items export.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card" style="padding:14px; margin-top:16px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-weight:900;">Quick Links</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    Jump to other admin tools.
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="btn ghost" id="btnGoDashboard">Dashboard</button>
+                                <button class="btn ghost" id="btnGoImports">Imports</button>
+                                <button class="btn ghost" id="btnGoLogs">Logs</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("admin");
+        mountSidebar("admin");
+        mountTopbar();
+
+        document.getElementById("btnGoDashboard").onclick = () => location.href = "/pages/admin/dashboard.html";
+        document.getElementById("btnGoImports").onclick = () => location.href = "/pages/admin/imports.html";
+        document.getElementById("btnGoLogs").onclick = () => location.href = "/pages/admin/logs.html";
+
+        const fType = document.getElementById("fType");
+        const fStatus = document.getElementById("fStatus");
+
+        const itemsState = document.getElementById("itemsState");
+        const claimsState = document.getElementById("claimsState");
+
+        document.getElementById("btnClear").onclick = () => {
+            fType.value = "";
+            fStatus.value = "";
+            itemsState.textContent = "";
+            claimsState.textContent = "";
+        };
+
+        function buildQuery() {
+            const p = new URLSearchParams();
+            if (fType.value) p.set("type", fType.value);
+            if (fStatus.value) p.set("status", fStatus.value);
+            return p.toString();
+        }
+
+        async function openFile(path) {
+            const res = await api.get(path); // Response for non-json
+            if (!(res instanceof Response)) return;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+        }
+
+        async function downloadFile(path, filename) {
+            const res = await api.get(path);
+            if (!(res instanceof Response)) return;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        // Items exports
+        document.getElementById("btnItemsExcel").onclick = async () => {
+            const q = buildQuery();
+            const path = `/exports/items/excel${q ? `?${q}` : ""}`;
+
+            itemsState.textContent = "Downloading Items Excel...";
+            try {
+                await downloadFile(path, "items.xlsx");
+                itemsState.textContent = "Downloaded Items Excel.";
+                toast("Items Excel downloaded.", "success");
+            } catch {
+                itemsState.textContent = "Failed to download Items Excel.";
+                toast("Export failed.", "danger");
+            }
+        };
+
+        document.getElementById("btnItemsPdf").onclick = async () => {
+            const q = buildQuery();
+            const path = `/exports/items/pdf${q ? `?${q}` : ""}`;
+
+            itemsState.textContent = "Opening Items PDF...";
+            try {
+                await openFile(path);
+                itemsState.textContent = "Opened Items PDF.";
+                toast("Items PDF opened.", "success");
+            } catch {
+                itemsState.textContent = "Failed to open Items PDF.";
+                toast("Export failed.", "danger");
+            }
+        };
+
+        // Claims exports (optional)
+        document.getElementById("btnClaimsExcel").onclick = async () => {
+            const q = buildQuery();
+            const path = `/exports/claims/excel${q ? `?${q}` : ""}`;
+
+            claimsState.textContent = "Downloading Claims Excel...";
+            try {
+                await downloadFile(path, "claims.xlsx");
+                claimsState.textContent = "Downloaded Claims Excel.";
+                toast("Claims Excel downloaded.", "success");
+            } catch {
+                claimsState.textContent = "Claims Excel endpoint not available or failed.";
+                toast("Claims export not available.", "warn");
+            }
+        };
+
+        document.getElementById("btnClaimsPdf").onclick = async () => {
+            const q = buildQuery();
+            const path = `/exports/claims/pdf${q ? `?${q}` : ""}`;
+
+            claimsState.textContent = "Opening Claims PDF...";
+            try {
+                await openFile(path);
+                claimsState.textContent = "Opened Claims PDF.";
+                toast("Claims PDF opened.", "success");
+            } catch {
+                claimsState.textContent = "Claims PDF endpoint not available or failed.";
+                toast("Claims export not available.", "warn");
+            }
+        };
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

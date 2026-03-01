@@ -1,0 +1,396 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
+    <title>Lost & Found - My Reports</title>
+</head>
+
+<body>
+    <!-- Premium Navbar -->
+    <nav id="navbar"></nav>
+
+    <main class="web-main">
+        <div class="web-container">
+
+            <div
+                style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 8px;">My <span class="text-gradient">Reports</span>
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
+                        Manage the lost and found items you have reported.
+                    </p>
+                </div>
+                <button class="web-btn web-btn-primary" id="btnNew">
+                    + New Report
+                </button>
+            </div>
+
+            <!-- Modern Filters -->
+            <div class="web-card"
+                style="padding: 24px; margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 16px; flex: 1; min-width: 300px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input class="web-input" id="q" placeholder="Search title, location, category..." />
+                    </div>
+                    <div style="width: 140px;">
+                        <select class="web-select" id="fType">
+                            <option value="">All Types</option>
+                            <option value="lost">Lost</option>
+                            <option value="found">Found</option>
+                        </select>
+                    </div>
+                    <div style="width: 140px;">
+                        <select class="web-select" id="fStatus">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="matched">Matched</option>
+                            <option value="claimed">Claimed</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button class="web-btn web-btn-primary" id="btnSearch"
+                        style="padding-left: 32px; padding-right: 32px;">Filter</button>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 8px;">
+                <div style="color: var(--text-muted);">
+                    Showing <span id="count" style="color: var(--text-main); font-weight: 600;">—</span> total reports
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="web-card" style="padding: 0; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 1000px; text-align: left;">
+                        <thead>
+                            <tr
+                                style="background: rgba(255, 255, 255, 0.02); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Item</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Type</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Status</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Location</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Created</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600; text-align: right;">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rows"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination inside the card -->
+                <div
+                    style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); background: rgba(0,0,0,0.1);">
+                    <div id="pageInfo" style="color: var(--text-muted); font-size: 0.95rem;">—</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="web-btn web-btn-glass" style="padding: 8px 16px; font-size: 0.9rem;"
+                            id="btnPrev">Previous</button>
+                        <button class="web-btn web-btn-glass" style="padding: 8px 16px; font-size: 0.9rem;"
+                            id="btnNext">Next</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="backdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:1000;"></div>
+    <div id="modal" class="card" style="
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(720px, calc(100vw - 32px));
+  padding:16px; display:none; z-index:1001;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+            <div>
+                <div style="font-weight:900; font-size:16px;">Edit Report</div>
+                <div id="mSub" style="color:var(--muted); margin-top:6px; font-size:13px;">—</div>
+            </div>
+            <button class="btn ghost" id="mClose">Close</button>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+            <div class="grid cols-2">
+                <div>
+                    <label style="display:block; color:var(--muted); font-size:12px; margin-bottom:6px;">Title</label>
+                    <input class="input" id="mTitle" />
+                </div>
+                <div>
+                    <label
+                        style="display:block; color:var(--muted); font-size:12px; margin-bottom:6px;">Location</label>
+                    <input class="input" id="mLocation" />
+                </div>
+            </div>
+
+            <div class="grid cols-2">
+                <div>
+                    <label
+                        style="display:block; color:var(--muted); font-size:12px; margin-bottom:6px;">Category</label>
+                    <input class="input" id="mCategory" />
+                </div>
+                <div>
+                    <label style="display:block; color:var(--muted); font-size:12px; margin-bottom:6px;">Date
+                        incident</label>
+                    <input class="input" id="mDate" type="date" />
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; color:var(--muted); font-size:12px; margin-bottom:6px;">Description</label>
+                <textarea id="mDesc" rows="4"></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                <button class="btn ghost" id="mCancel">Cancel</button>
+                <button class="btn primary" id="mSave">Save Changes</button>
+            </div>
+
+            <div id="mState" style="color:var(--muted); font-size:13px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountNavbar } from "/components/navbar.js";
+        import { guardPage } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        guardPage();
+        mountNavbar();
+
+        const rowsEl = document.getElementById("rows");
+        const countEl = document.getElementById("count");
+        const pageInfo = document.getElementById("pageInfo");
+
+        const qEl = document.getElementById("q");
+        const fStatus = document.getElementById("fStatus");
+        const fType = document.getElementById("fType");
+
+        document.getElementById("btnNew").onclick = () => location.href = "/pages/user/report.html";
+        document.getElementById("btnSearch").onclick = () => load();
+
+        let nextPath = null;
+        let prevPath = null;
+        let currentData = [];
+
+        // modal state
+        const backdrop = document.getElementById("backdrop");
+        const modal = document.getElementById("modal");
+        const mSub = document.getElementById("mSub");
+        const mTitle = document.getElementById("mTitle");
+        const mLocation = document.getElementById("mLocation");
+        const mCategory = document.getElementById("mCategory");
+        const mDate = document.getElementById("mDate");
+        const mDesc = document.getElementById("mDesc");
+        const mState = document.getElementById("mState");
+        const mClose = document.getElementById("mClose");
+        const mCancel = document.getElementById("mCancel");
+        const mSave = document.getElementById("mSave");
+
+        let editing = null;
+
+        function openModal(item) {
+            editing = item;
+            mSub.textContent = `Item #${item.id} • ${item.type.toUpperCase()} • ${item.status.toUpperCase()}`;
+            mTitle.value = item.title ?? "";
+            mLocation.value = item.location ?? "";
+            mCategory.value = item.category ?? "";
+            mDate.value = item.date_incident ?? "";
+            mDesc.value = item.description ?? "";
+            mState.textContent = "";
+            backdrop.style.display = "block";
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            backdrop.style.display = "none";
+            modal.style.display = "none";
+            editing = null;
+        }
+
+        mClose.onclick = closeModal;
+        mCancel.onclick = closeModal;
+        backdrop.onclick = closeModal;
+
+        function normalizePaginator(payload) {
+            if (payload && Array.isArray(payload.data)) return payload;
+            return {
+                data: Array.isArray(payload) ? payload : [],
+                current_page: 1,
+                last_page: 1,
+                from: payload?.length ? 1 : null,
+                to: payload?.length ?? null,
+                total: payload?.length ?? 0,
+                next_page_url: null,
+                prev_page_url: null
+            };
+        }
+
+        function stripApiPrefix(u) {
+            return u ? u.replace(/^\/api/, "") : null;
+        }
+
+        function pill(text) {
+            return `<span style="padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);font-size:12px;">${text}</span>`;
+        }
+
+        function row(item) {
+            const when = item.created_at ? new Date(item.created_at).toLocaleString() : "—";
+            return `
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:10px; font-weight:800;">
+          <div style="max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${item.title}
+          </div>
+          <div style="color:var(--muted); font-size:12px;">#${item.id}</div>
+        </td>
+        <td style="padding:10px;">${pill(item.type.toUpperCase())}</td>
+        <td style="padding:10px;">${pill(item.status.toUpperCase())}</td>
+        <td style="padding:10px; color:var(--muted);">${item.location ?? "—"}</td>
+        <td style="padding:10px; color:var(--muted);">${when}</td>
+        <td style="padding:10px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn ghost" data-view="${item.id}">View</button>
+            <button class="btn ghost" data-edit="${item.id}">Edit</button>
+            <button class="btn danger" data-del="${item.id}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+        }
+
+        async function load(path = "/items") {
+            const params = new URLSearchParams();
+            params.set("mine", "1");
+            params.set("per_page", "20");
+
+            if (fStatus.value) params.set("status", fStatus.value);
+            if (fType.value) params.set("type", fType.value);
+            if (qEl.value.trim()) params.set("q", qEl.value.trim());
+
+            const full = `${path}${path.includes("?") ? "&" : "?"}${params.toString()}`;
+
+            const payload = await api.get(full);
+            const p = normalizePaginator(payload);
+
+            currentData = p.data ?? [];
+
+            countEl.textContent = p.total ?? currentData.length;
+
+            if (!currentData.length) {
+                rowsEl.innerHTML = `
+        <tr><td colspan="6" style="padding:16px; color:var(--muted);">
+          No reports yet. Create a report from “New Report”.
+        </td></tr>
+      `;
+            } else {
+                rowsEl.innerHTML = currentData.map(row).join("");
+            }
+
+            pageInfo.textContent = `Page ${p.current_page} of ${p.last_page} • Showing ${p.from ?? 0}-${p.to ?? currentData.length} of ${p.total ?? currentData.length}`;
+
+            const next = p.next_page_url ? new URL(p.next_page_url).pathname + new URL(p.next_page_url).search : null;
+            const prev = p.prev_page_url ? new URL(p.prev_page_url).pathname + new URL(p.prev_page_url).search : null;
+
+            nextPath = stripApiPrefix(next);
+            prevPath = stripApiPrefix(prev);
+
+            document.querySelectorAll("[data-view]").forEach(btn => {
+                btn.onclick = () => location.href = `/pages/user/item-show.html?id=${encodeURIComponent(btn.dataset.view)}`;
+            });
+
+            document.querySelectorAll("[data-edit]").forEach(btn => {
+                btn.onclick = () => {
+                    const item = currentData.find(i => String(i.id) === String(btn.dataset.edit));
+                    if (item) openModal(item);
+                };
+            });
+
+            document.querySelectorAll("[data-del]").forEach(btn => {
+                btn.onclick = () => del(btn.dataset.del);
+            });
+        }
+
+        async function del(id) {
+            const ok = confirm("Delete this report? This cannot be undone.");
+            if (!ok) return;
+
+            try {
+                await api.del(`/items/${id}`);
+                toast("Deleted.", "success");
+                load("/items");
+            } catch {
+                toast("Delete failed.", "danger");
+            }
+        }
+
+        mSave.onclick = async () => {
+            if (!editing) return;
+
+            const payload = {
+                title: mTitle.value.trim(),
+                location: mLocation.value.trim() || null,
+                category: mCategory.value.trim() || null,
+                date_incident: mDate.value || null,
+                description: mDesc.value.trim() || null
+            };
+
+            if (!payload.title) {
+                toast("Title is required.", "warn");
+                return;
+            }
+
+            mState.textContent = "Saving...";
+            mSave.disabled = true;
+
+            try {
+                await api.put(`/items/${editing.id}`, payload);
+                toast("Updated.", "success");
+                closeModal();
+                load("/items");
+            } catch {
+                mState.textContent = "Failed to save.";
+                toast("Update failed.", "danger");
+            } finally {
+                mSave.disabled = false;
+            }
+        };
+
+        document.getElementById("btnPrev").onclick = () => {
+            if (!prevPath) return toast("No previous page.", "warn");
+            load(prevPath);
+        };
+
+        document.getElementById("btnNext").onclick = () => {
+            if (!nextPath) return toast("No next page.", "warn");
+            load(nextPath);
+        };
+
+        load("/items");
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

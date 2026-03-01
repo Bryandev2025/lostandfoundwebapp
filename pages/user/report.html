@@ -1,0 +1,365 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
+    <title>Report Lost/Found</title>
+</head>
+
+<body>
+    <!-- Premium Navbar -->
+    <nav id="navbar"></nav>
+
+    <main class="web-main">
+        <div class="web-container" style="max-width: 1000px;">
+            <div
+                style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 8px;">Report an <span class="text-gradient">Item</span>
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
+                        Submit a lost or found report. Add a clear photo to help with verification.
+                    </p>
+                </div>
+                <span id="pillState"
+                    style="padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; align-self: center;">
+                    DRAFT
+                </span>
+            </div>
+
+            <div class="grid" style="grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;">
+                <!-- Left: Form -->
+                <div class="web-card" style="padding: 32px;">
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="grid cols-2" style="gap: 16px;">
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Type</label>
+                                <select id="type" class="web-select">
+                                    <option value="lost">Lost</option>
+                                    <option value="found">Found</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Date
+                                    of incident</label>
+                                <input class="web-input" id="date_incident" type="date" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Title</label>
+                            <input class="web-input" id="title" placeholder="e.g., Black Wallet, iPhone 13, Umbrella" />
+                        </div>
+
+                        <div class="grid cols-2" style="gap: 16px;">
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Category</label>
+                                <input class="web-input" id="category" placeholder="e.g., Electronics, Personal, ID" />
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Location</label>
+                                <input class="web-input" id="location" placeholder="e.g., Library, Cafeteria" />
+                            </div>
+                        </div>
+
+                        <div class="grid cols-2" style="gap: 16px;">
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Brand
+                                    (optional)</label>
+                                <input class="web-input" id="brand" placeholder="e.g., Samsung, Nike" />
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Color
+                                    (optional)</label>
+                                <input class="web-input" id="color" placeholder="e.g., Black, Blue" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Description</label>
+                            <textarea id="description" class="web-input" style="min-height: 120px; resize: vertical;"
+                                placeholder="Add unique details: scratches, stickers, contents, etc."></textarea>
+                        </div>
+
+                        <div
+                            style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+                            <button class="web-btn web-btn-primary" id="btnSubmit" style="padding: 12px 24px;">Submit
+                                Report</button>
+                            <button class="web-btn web-btn-glass" id="btnReset" type="button"
+                                style="padding: 12px 24px;">Reset Form</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Photo uploader + Success state -->
+                <div style="display: flex; flex-direction: column; gap: 24px; position: sticky; top: 104px;">
+                    <div class="web-card" style="padding: 32px;">
+                        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Item Photo</h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5;">
+                            Upload a clear image to help with identification. Max 4MB. (Optional)
+                        </p>
+
+                        <div class="web-dropzone" id="dropzone">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                style="margin-bottom: 16px; opacity: 0.6;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <div
+                                style="font-weight: 300; font-size: 0.95rem; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                                Drag & Drop or <span style="text-decoration: underline;">Browse</span></div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Max size
+                                4MB. JPG, PNG, WEBP.</div>
+                            <input id="image" type="file" accept="image/png,image/jpeg,image/webp" />
+                        </div>
+
+                        <div id="previewWrap" style="margin-top: 16px; display: none;">
+                            <img id="preview" alt="preview"
+                                style="width: 100%; height: 240px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: rgba(0,0,0,0.2);" />
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;"
+                                    id="fileMeta">—</div>
+                                <button class="web-btn web-btn-glass" id="btnRemoveImage" type="button"
+                                    style="padding: 4px 12px; font-size: 0.85rem;">Remove</button>
+                            </div>
+                        </div>
+
+                        <div id="uploadState"
+                            style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem; text-align: center;">
+                        </div>
+                    </div>
+
+                    <div class="web-card" id="successCard"
+                        style="padding: 32px; display: none; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05);">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                            <h2 style="font-size: 1.3rem; color: #34d399; margin: 0;">Report Submitted</h2>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5;">
+                            Your report has been saved successfully. You can view the details or submit another report.
+                        </p>
+
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);"
+                            id="successMeta">—</div>
+
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="web-btn web-btn-primary" id="btnViewItem" type="button"
+                                style="flex: 1; justify-content: center; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;">View
+                                Item</button>
+                            <button class="web-btn web-btn-glass" id="btnNew" type="button"
+                                style="flex: 1; justify-content: center;">New Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { mountNavbar } from "/components/navbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("user", "staff", "admin");
+        mountNavbar();
+
+        // Elements
+        const pillState = document.getElementById("pillState");
+        const btnSubmit = document.getElementById("btnSubmit");
+        const btnReset = document.getElementById("btnReset");
+
+        const imageInput = document.getElementById("image");
+        const previewWrap = document.getElementById("previewWrap");
+        const preview = document.getElementById("preview");
+        const fileMeta = document.getElementById("fileMeta");
+        const btnRemoveImage = document.getElementById("btnRemoveImage");
+        const uploadState = document.getElementById("uploadState");
+
+        const successCard = document.getElementById("successCard");
+        const btnViewItem = document.getElementById("btnViewItem");
+        const btnNew = document.getElementById("btnNew");
+        const successMeta = document.getElementById("successMeta");
+
+        let createdItemId = null;
+
+        function setState(label, kind = "neutral") {
+            pillState.textContent = label;
+            const bg =
+                kind === "saving" ? "rgba(245,158,11,.14)" :
+                    kind === "success" ? "rgba(34,197,94,.14)" :
+                        kind === "error" ? "rgba(239,68,68,.14)" : "rgba(255,255,255,.06)";
+            const border =
+                kind === "saving" ? "rgba(245,158,11,.28)" :
+                    kind === "success" ? "rgba(34,197,94,.28)" :
+                        kind === "error" ? "rgba(239,68,68,.28)" : "rgba(255,255,255,.10)";
+            pillState.style.background = bg;
+            pillState.style.borderColor = border;
+        }
+
+        function formData() {
+            return {
+                type: document.getElementById("type").value,
+                title: document.getElementById("title").value.trim(),
+                description: document.getElementById("description").value.trim() || null,
+                category: document.getElementById("category").value.trim() || null,
+                brand: document.getElementById("brand").value.trim() || null,
+                color: document.getElementById("color").value.trim() || null,
+                location: document.getElementById("location").value.trim() || null,
+                date_incident: document.getElementById("date_incident").value || null,
+            };
+        }
+
+        function resetAll() {
+            createdItemId = null;
+            document.getElementById("type").value = "lost";
+            document.getElementById("date_incident").value = "";
+            document.getElementById("title").value = "";
+            document.getElementById("category").value = "";
+            document.getElementById("brand").value = "";
+            document.getElementById("color").value = "";
+            document.getElementById("location").value = "";
+            document.getElementById("description").value = "";
+            imageInput.value = "";
+            previewWrap.style.display = "none";
+            uploadState.textContent = "";
+            successCard.style.display = "none";
+            setState("Draft");
+        }
+
+        const dropzone = document.getElementById("dropzone");
+
+        // Drag and drop visual feedback
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+        });
+        dropzone.addEventListener('drop', (e) => {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        });
+
+        // Image preview
+        imageInput.addEventListener("change", function () { handleFiles(this.files) });
+
+        function handleFiles(files) {
+            const f = files?.[0];
+            if (!f) return;
+
+            if (f.size > 4 * 1024 * 1024) {
+                toast("Image too large. Max 4MB.", "warn");
+                imageInput.value = "";
+                return;
+            }
+
+            // Bind file to input if dropped
+            const dt = new DataTransfer();
+            dt.items.add(f);
+            imageInput.files = dt.files;
+
+            preview.src = URL.createObjectURL(f);
+            previewWrap.style.display = "block";
+            dropzone.style.display = "none";
+            fileMeta.textContent = `${f.name} • ${(f.size / 1024 / 1024).toFixed(2)} MB`;
+            uploadState.textContent = "";
+        }
+
+        btnRemoveImage.addEventListener("click", () => {
+            imageInput.value = "";
+            previewWrap.style.display = "none";
+            dropzone.style.display = "block";
+            uploadState.textContent = "";
+        });
+
+        btnReset.addEventListener("click", resetAll);
+
+        // Submit flow: create item -> upload image (optional)
+        btnSubmit.addEventListener("click", async () => {
+            try {
+                const payload = formData();
+
+                if (!payload.title) {
+                    toast("Title is required.", "warn");
+                    return;
+                }
+
+                setState("Saving...", "saving");
+                btnSubmit.disabled = true;
+
+                // 1) Create item
+                const created = await api.post("/items", payload);
+
+                // Depending on your API response shape:
+                // We expect: { message, item: {...} }
+                const item = created.item ?? created.data?.item ?? created.data ?? created;
+                createdItemId = item.id;
+
+                // 2) Upload image (optional)
+                const f = imageInput.files?.[0];
+                if (f) {
+                    uploadState.textContent = "Uploading photo...";
+                    const form = new FormData();
+                    form.append("image", f);
+
+                    await api.postForm(`/items/${createdItemId}/image`, form);
+                    uploadState.textContent = "Photo uploaded.";
+                }
+
+                setState("Submitted", "success");
+                toast("Report submitted successfully.", "success");
+
+                successCard.style.display = "block";
+                successMeta.textContent = `Item ID: ${createdItemId} • Type: ${payload.type.toUpperCase()} • Status: PENDING`;
+
+            } catch (e) {
+                setState("Error", "error");
+                // api.js already toasts message; this keeps UI consistent
+            } finally {
+                btnSubmit.disabled = false;
+            }
+        });
+
+        btnViewItem.addEventListener("click", () => {
+            if (!createdItemId) return;
+            window.location.href = `/pages/user/item-show.html?id=${encodeURIComponent(createdItemId)}`;
+        });
+
+        btnNew.addEventListener("click", resetAll);
+
+        // initial
+        setState("Draft");
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

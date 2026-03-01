@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Admin — Activity Logs</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="grid cols-3">
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:900;">Activity Logs</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Track system actions for auditing, troubleshooting, and defense proof.
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:800;">Filters</div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <select id="fAction">
+                                    <option value="">All Actions</option>
+                                    <option value="ITEM_CREATED">ITEM_CREATED</option>
+                                    <option value="ITEM_UPDATED">ITEM_UPDATED</option>
+                                    <option value="ITEM_DELETED">ITEM_DELETED</option>
+                                    <option value="CLAIM_SUBMITTED">CLAIM_SUBMITTED</option>
+                                    <option value="CLAIM_APPROVED">CLAIM_APPROVED</option>
+                                    <option value="CLAIM_DENIED">CLAIM_DENIED</option>
+                                    <option value="CLAIM_RELEASED">CLAIM_RELEASED</option>
+                                    <option value="ITEM_MATCHED">ITEM_MATCHED</option>
+                                    <option value="QR_GENERATED">QR_GENERATED</option>
+                                    <option value="ITEM_IMAGE_UPLOADED">ITEM_IMAGE_UPLOADED</option>
+                                    <option value="CLAIM_PROOF_UPLOADED">CLAIM_PROOF_UPLOADED</option>
+                                    <option value="EXPORT_ITEMS_EXCEL">EXPORT_ITEMS_EXCEL</option>
+                                    <option value="IMPORT_ITEMS">IMPORT_ITEMS</option>
+                                </select>
+
+                                <select id="fEntity">
+                                    <option value="">All Entities</option>
+                                    <option value="item">item</option>
+                                    <option value="claim">claim</option>
+                                    <option value="match">match</option>
+                                    <option value="report">report</option>
+                                    <option value="import">import</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <input class="input" id="fSearch" placeholder="Search actor, entity_id, action..." />
+                                <button class="btn primary" id="btnApply">Apply</button>
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <div id="statsCount" style="font-weight:900;">—</div>
+                                <div style="color:var(--muted); font-size:12px;">Total logs</div>
+                            </div>
+                            <button class="btn ghost" id="btnRefresh">Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding:14px; margin-top:16px; overflow:auto;">
+                        <table style="width:100%; border-collapse: collapse; min-width: 1050px;">
+                            <thead>
+                                <tr style="text-align:left; color:var(--muted); font-size:12px;">
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Time</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actor</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Action</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Entity</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Meta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rows"></tbody>
+                        </table>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;">
+                            <div id="pageInfo" style="color:var(--muted); font-size:13px;">—</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn ghost" id="btnPrev">Prev</button>
+                                <button class="btn ghost" id="btnNext">Next</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("admin");
+        mountSidebar("admin");
+        mountTopbar();
+
+        const qs = new URLSearchParams(window.location.search);
+
+        const fAction = document.getElementById("fAction");
+        const fEntity = document.getElementById("fEntity");
+        const fSearch = document.getElementById("fSearch");
+
+        fAction.value = qs.get("action") ?? "";
+        fEntity.value = qs.get("entity") ?? "";
+        fSearch.value = qs.get("q") ?? "";
+
+        const rowsEl = document.getElementById("rows");
+        const statsCount = document.getElementById("statsCount");
+        const pageInfo = document.getElementById("pageInfo");
+
+        let nextPath = null;
+        let prevPath = null;
+
+        function normalizePaginator(payload) {
+            if (payload && Array.isArray(payload.data)) return payload;
+            return {
+                data: Array.isArray(payload) ? payload : [],
+                current_page: 1,
+                last_page: 1,
+                from: payload?.length ? 1 : null,
+                to: payload?.length ?? null,
+                total: payload?.length ?? 0,
+                next_page_url: null,
+                prev_page_url: null,
+            };
+        }
+
+        function stripApiPrefix(u) {
+            return u ? u.replace(/^\/api/, "") : null;
+        }
+
+        function safeJson(meta) {
+            try {
+                if (!meta) return "—";
+                if (typeof meta === "string") return meta;
+                return JSON.stringify(meta);
+            } catch {
+                return "—";
+            }
+        }
+
+        function row(log) {
+            const when = log.created_at ? new Date(log.created_at).toLocaleString() : "—";
+            const actorName = log.actor?.name ?? "System";
+            const actorRole = log.actor?.role ? ` (${log.actor.role})` : "";
+            const entity = `${log.entity_type ?? "—"} #${log.entity_id ?? "—"}`;
+
+            const actionPill = `
+        <span style="
+          padding:6px 10px;border-radius:999px;
+          border:1px solid var(--border);
+          background:rgba(124,58,237,.16);
+          font-size:12px;">
+          ${log.action}
+        </span>`;
+
+            return `
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px; color:var(--muted);">${when}</td>
+
+          <td style="padding:10px;">
+            <div style="font-weight:800;">${actorName}${actorRole}</div>
+            <div style="color:var(--muted); font-size:12px;">ID: ${log.actor_id ?? "—"}</div>
+          </td>
+
+          <td style="padding:10px;">${actionPill}</td>
+
+          <td style="padding:10px;">
+            <div style="font-weight:800;">${entity}</div>
+          </td>
+
+          <td style="padding:10px; color:var(--muted); font-size:12px; max-width:520px;">
+            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${safeJson(log.meta)}
+            </div>
+          </td>
+        </tr>
+      `;
+        }
+
+        function applyQueryToUrl() {
+            const p = new URLSearchParams();
+            if (fAction.value) p.set("action", fAction.value);
+            if (fEntity.value) p.set("entity", fEntity.value);
+            if (fSearch.value.trim()) p.set("q", fSearch.value.trim());
+            window.location.search = p.toString();
+        }
+
+        async function loadLogs(path = "/logs/activity") {
+            const payload = await api.get(path);
+            const p = normalizePaginator(payload);
+
+            let logs = p.data;
+
+            // client-side filters
+            const action = fAction.value.trim();
+            const entity = fEntity.value.trim();
+            const q = fSearch.value.trim().toLowerCase();
+
+            if (action) logs = logs.filter(l => String(l.action) === action);
+            if (entity) logs = logs.filter(l => String(l.entity_type) === entity);
+
+            if (q) {
+                logs = logs.filter(l => {
+                    const hay = `${l.actor?.name ?? ""} ${l.actor?.role ?? ""} ${l.action ?? ""} ${l.entity_type ?? ""} ${l.entity_id ?? ""} ${safeJson(l.meta)}`.toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+
+            statsCount.textContent = p.total ?? logs.length;
+
+            if (!logs.length) {
+                rowsEl.innerHTML = `
+          <tr>
+            <td colspan="5" style="padding:16px;">
+              <div class="card" style="padding:16px;">
+                <div style="font-weight:900;">No logs found</div>
+                <div style="color:var(--muted); margin-top:6px;">
+                  Try different filters or clear search.
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+            } else {
+                rowsEl.innerHTML = logs.map(row).join("");
+            }
+
+            pageInfo.textContent = `Page ${p.current_page} of ${p.last_page} • Showing ${p.from ?? 0}-${p.to ?? logs.length} of ${p.total ?? logs.length}`;
+
+            const next = p.next_page_url ? new URL(p.next_page_url).pathname + new URL(p.next_page_url).search : null;
+            const prev = p.prev_page_url ? new URL(p.prev_page_url).pathname + new URL(p.prev_page_url).search : null;
+
+            nextPath = stripApiPrefix(next);
+            prevPath = stripApiPrefix(prev);
+        }
+
+        document.getElementById("btnApply").addEventListener("click", applyQueryToUrl);
+        document.getElementById("btnRefresh").addEventListener("click", () => loadLogs("/logs/activity"));
+
+        document.getElementById("btnPrev").addEventListener("click", () => {
+            if (!prevPath) return toast("No previous page.", "warn");
+            loadLogs(prevPath);
+        });
+
+        document.getElementById("btnNext").addEventListener("click", () => {
+            if (!nextPath) return toast("No next page.", "warn");
+            loadLogs(nextPath);
+        });
+
+        loadLogs("/logs/activity");
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

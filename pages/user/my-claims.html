@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
+    <title>Lost & Found - My Claims</title>
+</head>
+
+<body>
+    <!-- Premium Navbar -->
+    <nav id="navbar"></nav>
+
+    <main class="web-main">
+        <div class="web-container">
+
+            <div
+                style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 8px;">My <span class="text-gradient">Claims</span></h1>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
+                        Track your claim requests and their approval status.
+                    </p>
+                </div>
+                <button class="web-btn web-btn-glass" id="btnBrowse">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Browse Feed
+                </button>
+            </div>
+
+            <!-- Modern Filters -->
+            <div class="web-card"
+                style="padding: 24px; margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 16px; flex: 1; min-width: 300px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input class="web-input" id="q" placeholder="Search claim ID or item title..." />
+                    </div>
+                    <div style="width: 160px;">
+                        <select class="web-select" id="fStatus">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="denied">Denied</option>
+                            <option value="released">Released</option>
+                        </select>
+                    </div>
+                    <div style="width: 140px;">
+                        <select class="web-select" id="fPerPage">
+                            <option value="10">10 / Page</option>
+                            <option value="20" selected>20 / Page</option>
+                            <option value="50">50 / Page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button class="web-btn web-btn-primary" id="btnSearch"
+                        style="padding-left: 32px; padding-right: 32px;">Search</button>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 8px;">
+                <div style="color: var(--text-muted);">
+                    Showing <span id="count" style="color: var(--text-main); font-weight: 600;">—</span> total claims
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="web-card" style="padding: 0; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 1100px; text-align: left;">
+                        <thead>
+                            <tr
+                                style="background: rgba(255, 255, 255, 0.02); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Claim ID</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Item</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Status</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Submitted</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+                                    Notes</th>
+                                <th
+                                    style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 600; text-align: right;">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rows"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination inside the card -->
+                <div
+                    style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); background: rgba(0,0,0,0.1);">
+                    <div id="pageInfo" style="color: var(--text-muted); font-size: 0.95rem;">—</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="web-btn web-btn-glass" style="padding: 8px 16px; font-size: 0.9rem;"
+                            id="btnPrev">Previous</button>
+                        <button class="web-btn web-btn-glass" style="padding: 8px 16px; font-size: 0.9rem;"
+                            id="btnNext">Next</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { mountNavbar } from "/components/navbar.js";
+        import { guardPage } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        guardPage();
+        mountNavbar();
+
+        const rowsEl = document.getElementById("rows");
+        const countEl = document.getElementById("count");
+        const pageInfo = document.getElementById("pageInfo");
+
+        const qEl = document.getElementById("q");
+        const fStatus = document.getElementById("fStatus");
+        const fPerPage = document.getElementById("fPerPage");
+
+        document.getElementById("btnBrowse").onclick = () => location.href = "/pages/user/items.html";
+        document.getElementById("btnSearch").onclick = () => load();
+
+        let nextPath = null;
+        let prevPath = null;
+        let currentData = [];
+
+        function normalizePaginator(payload) {
+            if (payload && Array.isArray(payload.data)) return payload;
+            return {
+                data: Array.isArray(payload) ? payload : [],
+                current_page: 1,
+                last_page: 1,
+                from: payload?.length ? 1 : null,
+                to: payload?.length ?? null,
+                total: payload?.length ?? 0,
+                next_page_url: null,
+                prev_page_url: null
+            };
+        }
+
+        function stripApiPrefix(u) {
+            return u ? u.replace(/^\/api/, "") : null;
+        }
+
+        function pill(status) {
+            const bg =
+                status === "pending" ? "rgba(245,158,11,.18)" :
+                    status === "approved" ? "rgba(34,197,94,.16)" :
+                        status === "denied" ? "rgba(239,68,68,.16)" :
+                            status === "released" ? "rgba(124,58,237,.16)" : "rgba(255,255,255,.08)";
+
+            return `<span style="padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:${bg};font-size:12px;">
+      ${status.toUpperCase()}
+    </span>`;
+        }
+
+        function row(c) {
+            const when = c.created_at ? new Date(c.created_at).toLocaleString() : "—";
+            const itemTitle = c.item?.title ?? `Item #${c.item_id}`;
+            const notes = c.review_notes ?? "—";
+
+            return `
+      <tr style="border-bottom:1px solid var(--card-border); transition: background 0.2s ease;">
+        <td style="padding:16px 24px; font-weight:700; color: var(--text-main);">#${c.id}</td>
+
+        <td style="padding:16px 24px;">
+          <div style="font-weight:600; color: var(--text-main); margin-bottom: 4px; max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${itemTitle}
+          </div>
+          <div style="color:var(--text-muted); font-size:0.85rem; display: flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            ${c.item?.location ?? "Unknown Area"}
+          </div>
+        </td>
+
+        <td style="padding:16px 24px;">${pill(c.status)}</td>
+
+        <td style="padding:16px 24px; color:var(--text-muted); font-size: 0.95rem;">${when}</td>
+
+        <td style="padding:16px 24px; color:var(--text-muted); font-size:0.9rem; max-width:280px;">
+          <div style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height: 1.4;">${notes}</div>
+        </td>
+
+        <td style="padding:16px 24px; text-align: right;">
+          <div style="display:flex; gap:8px; justify-content: flex-end;">
+            <button class="web-btn web-btn-glass" style="padding: 6px 12px; font-size: 0.85rem;" data-open-item="${c.item_id}">View Item</button>
+            ${c.proof_image_path ? `<button class="web-btn web-btn-glass" style="padding: 6px 12px; font-size: 0.85rem;" data-proof="${c.proof_image_path}">Image</button>` : ""}
+          </div>
+        </td>
+      </tr>
+    `;
+        }
+
+        async function load(path = "/my/claims") {
+            const params = new URLSearchParams();
+            params.set("per_page", fPerPage.value);
+
+            if (fStatus.value) params.set("status", fStatus.value);
+            if (qEl.value.trim()) params.set("q", qEl.value.trim());
+
+            const full = `${path}${path.includes("?") ? "&" : "?"}${params.toString()}`;
+
+            const payload = await api.get(full);
+            const p = normalizePaginator(payload);
+
+            currentData = p.data ?? [];
+            countEl.textContent = p.total ?? currentData.length;
+
+            // client-side search fallback
+            const q = qEl.value.trim().toLowerCase();
+            let view = currentData;
+            if (q) {
+                view = currentData.filter(c => {
+                    const hay = `${c.id} ${c.status} ${c.item?.title ?? ""} ${c.item?.location ?? ""} ${c.review_notes ?? ""}`.toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+
+            if (!view.length) {
+                rowsEl.innerHTML = `
+        <tr><td colspan="6" style="padding:16px; color:var(--muted);">
+          No claims found.
+        </td></tr>
+      `;
+            } else {
+                rowsEl.innerHTML = view.map(row).join("");
+            }
+
+            pageInfo.textContent = `Page ${p.current_page} of ${p.last_page} • Showing ${p.from ?? 0}-${p.to ?? view.length} of ${p.total ?? view.length}`;
+
+            const next = p.next_page_url ? new URL(p.next_page_url).pathname + new URL(p.next_page_url).search : null;
+            const prev = p.prev_page_url ? new URL(p.prev_page_url).pathname + new URL(p.prev_page_url).search : null;
+
+            nextPath = stripApiPrefix(next);
+            prevPath = stripApiPrefix(prev);
+
+            document.querySelectorAll("[data-open-item]").forEach(btn => {
+                btn.onclick = () => location.href = `/pages/user/item-show.html?id=${encodeURIComponent(btn.dataset.openItem)}`;
+            });
+
+            document.querySelectorAll("[data-proof]").forEach(btn => {
+                btn.onclick = () => window.open(`/storage/${btn.dataset.proof}`, "_blank");
+            });
+        }
+
+        document.getElementById("btnPrev").onclick = () => {
+            if (!prevPath) return toast("No previous page.", "warn");
+            load(prevPath);
+        };
+
+        document.getElementById("btnNext").onclick = () => {
+            if (!nextPath) return toast("No next page.", "warn");
+            load(nextPath);
+        };
+
+        load("/my/claims");
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

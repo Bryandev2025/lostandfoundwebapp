@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/app.css">
+  <title>Admin — Dashboard</title>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar card" id="sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar card" id="topbar"></header>
+
+      <main class="content">
+        <div class="container">
+
+          <!-- Hero -->
+          <div class="card" style="padding:18px;">
+            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+              <div>
+                <div style="font-weight:950; font-size:22px; letter-spacing:.2px;">Admin Overview</div>
+                <div style="color:var(--muted); margin-top:6px;">
+                  Monitor activity, review system health, and access reports quickly.
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn ghost" id="btnGoLogs">View Logs</button>
+                <button class="btn ghost" id="btnGoExports">Exports</button>
+                <button class="btn primary" id="btnGoClaims">Claims Queue</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="grid cols-3" style="margin-top:16px;">
+            <div class="card" style="padding:16px;">
+              <div style="color:var(--muted); font-size:12px;">Pending Items</div>
+              <div id="kPendingItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Needs review / matching</div>
+            </div>
+
+            <div class="card" style="padding:16px;">
+              <div style="color:var(--muted); font-size:12px;">Pending Claims</div>
+              <div id="kPendingClaims" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Waiting for staff decision</div>
+            </div>
+
+            <div class="card" style="padding:16px;">
+              <div style="color:var(--muted); font-size:12px;">Matched Items</div>
+              <div id="kMatchedItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Suggested/confirmed matches</div>
+            </div>
+          </div>
+
+          <div class="grid cols-3" style="margin-top:12px;">
+            <div class="card" style="padding:16px;">
+              <div style="color:var(--muted); font-size:12px;">Claimed Items</div>
+              <div id="kClaimedItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Approved and collected</div>
+            </div>
+
+            <div class="card" style="padding:16px;">
+              <div style="color:var(--muted); font-size:12px;">System Status</div>
+              <div id="kSystem" style="font-weight:950; font-size:18px; margin-top:8px;">Online</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">API reachable</div>
+            </div>
+
+            <div class="card" style="padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="color:var(--muted); font-size:12px;">Quick Actions</div>
+                <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn ghost" id="btnGoImports">Imports</button>
+                  <button class="btn ghost" id="btnGoPrints">Print Center</button>
+                  <button class="btn success" id="btnRefresh">Refresh</button>
+                </div>
+              </div>
+              <div style="color:var(--muted); font-size:12px; margin-top:10px;">
+                Tip: Refresh before demo to show live KPIs.
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest Activity -->
+          <div class="card" style="padding:14px; margin-top:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:900;">Latest Activity</div>
+                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                  Recent actions across items, claims, matches, and QR.
+                </div>
+              </div>
+              <button class="btn ghost" id="btnOpenLogs">Open Logs</button>
+            </div>
+
+            <div style="margin-top:12px; overflow:auto;">
+              <table style="width:100%; border-collapse:collapse; min-width: 980px;">
+                <thead>
+                  <tr style="text-align:left; color:var(--muted); font-size:12px;">
+                    <th style="padding:10px; border-bottom:1px solid var(--border);">Time</th>
+                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actor</th>
+                    <th style="padding:10px; border-bottom:1px solid var(--border);">Action</th>
+                    <th style="padding:10px; border-bottom:1px solid var(--border);">Entity</th>
+                    <th style="padding:10px; border-bottom:1px solid var(--border);">Meta</th>
+                  </tr>
+                </thead>
+                <tbody id="logRows"></tbody>
+              </table>
+            </div>
+
+            <div id="logHint" style="margin-top:10px; color:var(--muted); font-size:12px;"></div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { mountSidebar } from "/components/sidebar.js";
+    import { mountTopbar } from "/components/topbar.js";
+    import { requireAuth, requireRole } from "/core/auth.js";
+    import { api } from "/core/api.js";
+    import { toast } from "/components/toast.js";
+
+    requireAuth();
+    requireRole("admin");
+    mountSidebar("admin");
+    mountTopbar();
+
+    const kPendingItems = document.getElementById("kPendingItems");
+    const kPendingClaims = document.getElementById("kPendingClaims");
+    const kMatchedItems = document.getElementById("kMatchedItems");
+    const kClaimedItems = document.getElementById("kClaimedItems");
+    const kSystem = document.getElementById("kSystem");
+
+    const logRows = document.getElementById("logRows");
+    const logHint = document.getElementById("logHint");
+
+    // Navigation buttons
+    document.getElementById("btnGoLogs").onclick = () => location.href = "/pages/admin/logs.html";
+    document.getElementById("btnOpenLogs").onclick = () => location.href = "/pages/admin/logs.html";
+    document.getElementById("btnGoClaims").onclick = () => location.href = "/pages/staff/claims.html";
+    document.getElementById("btnGoExports").onclick = () => location.href = "/pages/admin/exports.html";
+    document.getElementById("btnGoImports").onclick = () => location.href = "/pages/admin/imports.html";
+    document.getElementById("btnGoPrints").onclick = () => location.href = "/pages/staff/prints.html";
+
+    document.getElementById("btnRefresh").onclick = () => loadAll();
+
+    function normalizePaginator(payload) {
+      if (payload && typeof payload === "object" && Array.isArray(payload.data)) return payload;
+      return { data: Array.isArray(payload) ? payload : [], total: payload?.length ?? 0 };
+    }
+
+    async function getTotal(path) {
+      try {
+        const payload = await api.get(path);
+        const p = normalizePaginator(payload);
+        return typeof p.total === "number" ? p.total : (p.data?.length ?? 0);
+      } catch {
+        return null;
+      }
+    }
+
+    function safeJson(meta) {
+      try {
+        if (!meta) return "—";
+        if (typeof meta === "string") return meta;
+        const s = JSON.stringify(meta);
+        return s.length > 120 ? s.slice(0, 120) + "…" : s;
+      } catch {
+        return "—";
+      }
+    }
+
+    function actionPill(action) {
+      return `
+        <span style="padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(124,58,237,.16);font-size:12px;">
+          ${action}
+        </span>
+      `;
+    }
+
+    function logRow(l) {
+      const when = l.created_at ? new Date(l.created_at).toLocaleString() : "—";
+      const actor = l.actor?.name ?? "System";
+      const entity = `${l.entity_type ?? "—"} #${l.entity_id ?? "—"}`;
+
+      return `
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px; color:var(--muted);">${when}</td>
+          <td style="padding:10px;">
+            <div style="font-weight:800;">${actor}</div>
+            <div style="color:var(--muted); font-size:12px;">${l.actor?.role ?? ""}</div>
+          </td>
+          <td style="padding:10px;">${actionPill(l.action)}</td>
+          <td style="padding:10px; font-weight:800;">${entity}</td>
+          <td style="padding:10px; color:var(--muted); font-size:12px;">${safeJson(l.meta)}</td>
+        </tr>
+      `;
+    }
+
+    async function loadKPIs() {
+      // Use per_page=1 so we read only totals from paginator
+      const [pendingItems, pendingClaims, matchedItems, claimedItems] = await Promise.all([
+        getTotal("/items?status=pending&per_page=1"),
+        getTotal("/claims?status=pending&per_page=1"),
+        getTotal("/items?status=matched&per_page=1"),
+        getTotal("/items?status=claimed&per_page=1"),
+      ]);
+
+      kPendingItems.textContent = pendingItems ?? "—";
+      kPendingClaims.textContent = pendingClaims ?? "—";
+      kMatchedItems.textContent = matchedItems ?? "—";
+      kClaimedItems.textContent = claimedItems ?? "—";
+    }
+
+    async function loadLatestLogs() {
+      try {
+        const payload = await api.get("/logs/activity");
+        const p = normalizePaginator(payload);
+
+        const latest = (p.data ?? []).slice(0, 8);
+        if (!latest.length) {
+          logRows.innerHTML = `
+            <tr><td colspan="5" style="padding:14px; color:var(--muted);">No logs yet.</td></tr>
+          `;
+          logHint.textContent = "Perform an action (create item, approve claim) then refresh to see logs.";
+          return;
+        }
+
+        logRows.innerHTML = latest.map(logRow).join("");
+        logHint.textContent = "Showing the latest actions. Open Logs for the full list.";
+      } catch {
+        logRows.innerHTML = `
+          <tr><td colspan="5" style="padding:14px; color:var(--muted);">Unable to load logs.</td></tr>
+        `;
+        logHint.textContent = "Check API route /logs/activity and admin auth role.";
+      }
+    }
+
+    async function checkSystem() {
+      // Lightweight reachability check using an existing endpoint
+      try {
+        await api.get("/items?per_page=1");
+        kSystem.textContent = "Online";
+      } catch {
+        kSystem.textContent = "Offline";
+      }
+    }
+
+    async function loadAll() {
+      toast("Refreshing dashboard…", "info");
+      await Promise.all([checkSystem(), loadKPIs(), loadLatestLogs()]);
+      toast("Dashboard updated.", "success");
+    }
+
+    loadAll();
+  </script>
+
+  <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

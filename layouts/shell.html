@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Lost & Found</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content" id="content">
+                <!-- page content goes here -->
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth } from "/core/auth.js";
+
+        requireAuth();
+        mountSidebar("user");  // change to "staff" or "admin" on other pages
+        mountTopbar();
+    </script>
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

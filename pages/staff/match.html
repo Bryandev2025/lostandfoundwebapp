@@ -1,0 +1,293 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Staff — Match Items</title>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="card" style="padding:16px;">
+                        <div style="font-weight:900;">
+                            Match Lost and Found Items
+                        </div>
+
+                        <div style="color:var(--muted); margin-top:6px;">
+                            Select one lost item and one found item to mark as matched.
+                        </div>
+                    </div>
+
+
+                    <div class="grid cols-2" style="margin-top:16px;">
+
+                        <!-- LOST -->
+                        <div class="card" style="padding:16px;">
+
+                            <div style="font-weight:900;">
+                                Lost Items
+                            </div>
+
+                            <input class="input" id="lostSearch" placeholder="Search lost items..."
+                                style="margin-top:10px;">
+
+                            <div id="lostList" style="margin-top:12px;
+                        max-height:400px;
+                        overflow:auto;">
+                            </div>
+
+                        </div>
+
+
+                        <!-- FOUND -->
+                        <div class="card" style="padding:16px;">
+
+                            <div style="font-weight:900;">
+                                Found Items
+                            </div>
+
+                            <input class="input" id="foundSearch" placeholder="Search found items..."
+                                style="margin-top:10px;">
+
+                            <div id="foundList" style="margin-top:12px;
+                        max-height:400px;
+                        overflow:auto;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MATCH BUTTON -->
+                    <div class="card" style="padding:16px;
+                    margin-top:16px;
+                    text-align:center;">
+
+                        <button class="btn primary" id="matchBtn">
+                            Match Selected Items
+                        </button>
+
+                        <div id="matchState" style="margin-top:10px;
+                      color:var(--muted);">
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <script type="module">
+
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+
+        requireAuth();
+        requireRole("staff", "admin");
+
+        mountSidebar("staff");
+        mountTopbar();
+
+
+
+        let lostItems = [];
+        let foundItems = [];
+
+        let selectedLost = null;
+        let selectedFound = null;
+
+
+
+        function renderList(items, container, type) {
+            container.innerHTML =
+                items.map(item => `
+
+      <div class="card"
+           style="
+             padding:10px;
+             margin-bottom:8px;
+             cursor:pointer;
+             border:
+               ${(type === "lost" && selectedLost === item.id)
+                        ||
+                        (type === "found" && selectedFound === item.id)
+                        ? "2px solid var(--brand)"
+                        : "1px solid var(--border)"
+                    };
+           "
+
+           data-id="${item.id}">
+
+        <div style="font-weight:800;">
+          ${item.title}
+        </div>
+
+        <div style="
+             font-size:12px;
+             color:var(--muted);">
+          ${item.location ?? "-"}
+        </div>
+
+      </div>
+
+    `).join("");
+
+
+
+            container
+                .querySelectorAll("[data-id]")
+                .forEach(el => {
+
+                    el.onclick = () => {
+
+                        const id = parseInt(el.dataset.id);
+
+                        if (type === "lost")
+                            selectedLost = id;
+                        else
+                            selectedFound = id;
+
+                        renderList(
+                            type === "lost" ? lostItems : foundItems,
+                            container,
+                            type
+                        );
+
+                    };
+
+                });
+
+        }
+
+
+
+        async function loadLost() {
+            const res =
+                await api.get(
+                    "/items?type=lost&status=pending"
+                );
+
+            lostItems =
+                res.data ?? res;
+
+            renderList(
+                lostItems,
+                document.getElementById("lostList"),
+                "lost"
+            );
+        }
+
+
+
+        async function loadFound() {
+            const res =
+                await api.get(
+                    "/items?type=found&status=pending"
+                );
+
+            foundItems =
+                res.data ?? res;
+
+            renderList(
+                foundItems,
+                document.getElementById("foundList"),
+                "found"
+            );
+        }
+
+
+
+        document
+            .getElementById("matchBtn")
+            .onclick = async () => {
+
+                if (!selectedLost || !selectedFound) {
+                    toast(
+                        "Select both lost and found items",
+                        "warn"
+                    );
+                    return;
+                }
+
+
+                document
+                    .getElementById("matchState")
+                    .innerHTML = "Matching...";
+
+
+                try {
+
+                    await api.post(
+                        "/matches",
+                        {
+                            lost_item_id: selectedLost,
+                            found_item_id: selectedFound
+                        }
+                    );
+
+
+                    toast(
+                        "Items matched successfully",
+                        "success"
+                    );
+
+
+                    document
+                        .getElementById("matchState")
+                        .innerHTML = "Match created";
+
+
+                    selectedLost = null;
+                    selectedFound = null;
+
+
+                    loadLost();
+                    loadFound();
+
+                }
+                catch (e) {
+                    document
+                        .getElementById("matchState")
+                        .innerHTML = "Failed";
+                }
+
+            };
+
+
+
+        loadLost();
+        loadFound();
+
+
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+
+</body>
+
+</html>

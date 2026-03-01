@@ -1,0 +1,412 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Staff — Claims Queue</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <!-- Header row -->
+                    <div class="grid cols-3">
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:900;">Claims Queue</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Review claims, approve/deny, and release items.
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding:14px;">
+                            <div style="display:flex; gap:10px;">
+                                <select id="fStatus">
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="denied">Denied</option>
+                                    <option value="released">Released</option>
+                                    <option value="">All</option>
+                                </select>
+                                <select id="fPerPage">
+                                    <option value="10">10 / page</option>
+                                    <option value="20" selected>20 / page</option>
+                                    <option value="50">50 / page</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <input class="input" id="fSearch"
+                                    placeholder="Search item title, claimer name, location..." />
+                                <button class="btn primary" id="btnApply">Apply</button>
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <div id="statsCount" style="font-weight:900;">—</div>
+                                <div style="color:var(--muted); font-size:12px;">Total claims</div>
+                            </div>
+                            <button class="btn ghost" id="btnRefresh">Refresh</button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card" style="padding:14px; margin-top:16px; overflow:auto;">
+                        <table style="width:100%; border-collapse: collapse; min-width: 980px;">
+                            <thead>
+                                <tr style="text-align:left; color:var(--muted); font-size:12px;">
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Claim</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Item</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Claimer</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Status</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Submitted</th>
+                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rows"></tbody>
+                        </table>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;">
+                            <div id="pageInfo" style="color:var(--muted); font-size:13px;">—</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn ghost" id="btnPrev">Prev</button>
+                                <button class="btn ghost" id="btnNext">Next</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:1000;">
+    </div>
+    <div id="modal" class="card" style="
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(680px, calc(100vw - 32px));
+    padding:16px; display:none; z-index:1001;
+  ">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+            <div>
+                <div id="mTitle" style="font-weight:900; font-size:16px;">—</div>
+                <div id="mSub" style="color:var(--muted); margin-top:6px; font-size:13px;">—</div>
+            </div>
+            <button class="btn ghost" id="mClose">Close</button>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+            <textarea id="mNotes" rows="4" placeholder="Review notes (optional)"></textarea>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="btn danger" id="mDeny">Deny</button>
+                <button class="btn success" id="mApprove">Approve</button>
+                <button class="btn primary" id="mRelease">Release</button>
+            </div>
+
+            <div id="mState" style="color:var(--muted); font-size:13px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("staff", "admin");
+        mountSidebar("staff");
+        mountTopbar();
+
+        const qs = new URLSearchParams(window.location.search);
+
+        const fStatus = document.getElementById("fStatus");
+        const fPerPage = document.getElementById("fPerPage");
+        const fSearch = document.getElementById("fSearch");
+
+        fStatus.value = qs.get("status") ?? "pending";
+        fPerPage.value = qs.get("per_page") ?? "20";
+        fSearch.value = qs.get("q") ?? "";
+
+        const rowsEl = document.getElementById("rows");
+        const statsCount = document.getElementById("statsCount");
+        const pageInfo = document.getElementById("pageInfo");
+
+        const modalBackdrop = document.getElementById("modalBackdrop");
+        const modal = document.getElementById("modal");
+        const mTitle = document.getElementById("mTitle");
+        const mSub = document.getElementById("mSub");
+        const mNotes = document.getElementById("mNotes");
+        const mState = document.getElementById("mState");
+        const mClose = document.getElementById("mClose");
+        const mApprove = document.getElementById("mApprove");
+        const mDeny = document.getElementById("mDeny");
+        const mRelease = document.getElementById("mRelease");
+
+        let current = null; // current claim in modal
+        let nextPath = null;
+        let prevPath = null;
+
+        function openModal(claim) {
+            current = claim;
+            mNotes.value = "";
+            mState.textContent = "";
+            mTitle.textContent = `Claim #${claim.id}`;
+            mSub.textContent = `${claim.claimer?.name ?? "Unknown"} • Item: ${claim.item?.title ?? ("Item #" + claim.item_id)} • Status: ${claim.status}`;
+
+            // Show buttons depending on status
+            const st = claim.status;
+            mApprove.style.display = (st === "pending") ? "inline-flex" : "none";
+            mDeny.style.display = (st === "pending") ? "inline-flex" : "none";
+            mRelease.style.display = (st === "approved") ? "inline-flex" : "none";
+
+            modalBackdrop.style.display = "block";
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modalBackdrop.style.display = "none";
+            modal.style.display = "none";
+            current = null;
+        }
+
+        mClose.addEventListener("click", closeModal);
+        modalBackdrop.addEventListener("click", closeModal);
+
+        function badge(status) {
+            const bg =
+                status === "pending" ? "rgba(245,158,11,.18)" :
+                    status === "approved" ? "rgba(34,197,94,.16)" :
+                        status === "denied" ? "rgba(239,68,68,.16)" :
+                            status === "released" ? "rgba(124,58,237,.16)" : "rgba(255,255,255,.08)";
+
+            return `<span style="padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:${bg};font-size:12px;">
+        ${status.toUpperCase()}
+      </span>`;
+        }
+
+        function row(claim) {
+            const itemTitle = claim.item?.title ?? `Item #${claim.item_id}`;
+            const itemLoc = claim.item?.location ?? "—";
+            const submitted = claim.created_at ? new Date(claim.created_at).toLocaleString() : "—";
+
+            return `
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px; font-weight:800;">#${claim.id}</td>
+
+          <td style="padding:10px;">
+            <div style="font-weight:800; max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${itemTitle}
+            </div>
+            <div style="color:var(--muted); font-size:12px;">${itemLoc}</div>
+          </td>
+
+          <td style="padding:10px;">
+            <div style="font-weight:800;">${claim.claimer?.name ?? "—"}</div>
+            <div style="color:var(--muted); font-size:12px;">${claim.claimer?.email ?? ""}</div>
+          </td>
+
+          <td style="padding:10px;">${badge(claim.status)}</td>
+          <td style="padding:10px; color:var(--muted);">${submitted}</td>
+
+          <td style="padding:10px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn ghost" data-open="${claim.id}">Review</button>
+
+              <button class="btn ghost" data-print-claim="${claim.id}">
+                Print Slip
+              </button>
+
+              <button class="btn ghost" data-print-item="${claim.item_id}">
+                Print Item
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+        }
+
+        function normalizePaginator(payload) {
+            if (payload && Array.isArray(payload.data)) return payload;
+            return {
+                data: Array.isArray(payload) ? payload : [],
+                current_page: 1,
+                last_page: 1,
+                from: payload?.length ? 1 : null,
+                to: payload?.length ?? null,
+                total: payload?.length ?? 0,
+                next_page_url: null,
+                prev_page_url: null,
+            };
+        }
+
+        function stripApiPrefix(u) {
+            return u ? u.replace(/^\/api/, "") : null;
+        }
+
+        function applyQueryToUrl() {
+            const p = new URLSearchParams();
+            if (fStatus.value) p.set("status", fStatus.value);
+            if (fPerPage.value) p.set("per_page", fPerPage.value);
+            if (fSearch.value.trim()) p.set("q", fSearch.value.trim());
+            window.location.search = p.toString();
+        }
+
+        async function loadClaims(path = "/claims") {
+            // If your API endpoint is different (e.g. /staff/claims), tell me and I’ll adjust.
+            const params = new URLSearchParams();
+            if (fStatus.value) params.set("status", fStatus.value);
+            if (fPerPage.value) params.set("per_page", fPerPage.value);
+
+            const fullPath = `${path}${path.includes("?") ? "&" : "?"}${params.toString()}`;
+
+            const payload = await api.get(fullPath);
+            const p = normalizePaginator(payload);
+
+            let claims = p.data;
+
+            // Client-side search (safe even if backend doesn't implement q)
+            const q = fSearch.value.trim().toLowerCase();
+            if (q) {
+                claims = claims.filter(c => {
+                    const hay = `${c.id} ${c.status} ${c.claimer?.name ?? ""} ${c.claimer?.email ?? ""} ${c.item?.title ?? ""} ${c.item?.location ?? ""}`.toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+
+            statsCount.textContent = p.total ?? claims.length;
+
+            if (!claims.length) {
+                rowsEl.innerHTML = `
+          <tr>
+            <td colspan="6" style="padding:16px;">
+              <div class="card" style="padding:16px;">
+                <div style="font-weight:900;">No claims found</div>
+                <div style="color:var(--muted); margin-top:6px;">
+                  Try switching status filter or clear search.
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+            } else {
+                rowsEl.innerHTML = claims.map(row).join("");
+            }
+
+            pageInfo.textContent = `Page ${p.current_page} of ${p.last_page} • Showing ${p.from ?? 0}-${p.to ?? claims.length} of ${p.total ?? claims.length}`;
+
+            const next = p.next_page_url ? new URL(p.next_page_url).pathname + new URL(p.next_page_url).search : null;
+            const prev = p.prev_page_url ? new URL(p.prev_page_url).pathname + new URL(p.prev_page_url).search : null;
+
+            nextPath = stripApiPrefix(next);
+            prevPath = stripApiPrefix(prev);
+
+            // Bind action buttons
+            document.querySelectorAll("[data-open]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-open");
+                    const claim = claims.find(c => String(c.id) === String(id));
+                    if (claim) openModal(claim);
+                });
+            });
+
+            document.querySelectorAll("[data-print-claim]").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const id = btn.getAttribute("data-print-claim");
+                    // open PDF in new tab; token-based auth means fetch->blob may be needed
+                    // easiest: open a dedicated print page later. For now: fetch blob
+                    await openPdf(`/print/claims/${id}/slip`);
+                });
+            });
+
+            document.querySelectorAll("[data-print-item]").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const id = btn.getAttribute("data-print-item");
+                    await openPdf(`/print/items/${id}`);
+                });
+            });
+        }
+
+        async function openPdf(path) {
+            try {
+                const res = await api.get(path); // api.get returns Response for non-json
+                if (!(res instanceof Response)) return;
+
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");
+            } catch (e) {
+                toast("Unable to open PDF.", "danger");
+            }
+        }
+
+        async function doAction(action) {
+            if (!current) return;
+
+            const notes = mNotes.value.trim() || null;
+            mState.textContent = "Processing...";
+
+            try {
+                if (action === "approve") {
+                    await api.put(`/claims/${current.id}/approve`, { review_notes: notes });
+                    toast("Claim approved.", "success");
+                }
+
+                if (action === "deny") {
+                    await api.put(`/claims/${current.id}/deny`, { review_notes: notes });
+                    toast("Claim denied.", "success");
+                }
+
+                if (action === "release") {
+                    await api.put(`/claims/${current.id}/release`, { review_notes: notes });
+                    toast("Item released.", "success");
+                }
+
+                closeModal();
+                await loadClaims("/claims");
+            } catch (e) {
+                mState.textContent = "Failed. Please try again.";
+            }
+        }
+
+        mApprove.addEventListener("click", () => doAction("approve"));
+        mDeny.addEventListener("click", () => doAction("deny"));
+        mRelease.addEventListener("click", () => doAction("release"));
+
+        document.getElementById("btnApply").addEventListener("click", applyQueryToUrl);
+        document.getElementById("btnRefresh").addEventListener("click", () => loadClaims("/claims"));
+
+        document.getElementById("btnPrev").addEventListener("click", () => {
+            if (!prevPath) return toast("No previous page.", "warn");
+            loadClaims(prevPath);
+        });
+
+        document.getElementById("btnNext").addEventListener("click", () => {
+            if (!nextPath) return toast("No next page.", "warn");
+            loadClaims(nextPath);
+        });
+
+        // Initial load
+        loadClaims("/claims");
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,391 @@
+:root {
+  /* High-end Color Palette (Lightweight Aesthetic) */
+  --bg-dark: #000000;
+  --bg-darker: #050505;
+  --card-bg: #000000;
+  --card-border: rgba(255, 255, 255, 0.15);
+  --glass-bg: rgba(0, 0, 0, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  --text-main: #FFFFFF;
+  --text-muted: #888888;
+
+  /* Minimal Accents */
+  --accent-primary: #FFFFFF;
+  --accent-secondary: #CCCCCC;
+  --accent-gradient: linear-gradient(135deg, #FFFFFF, #AAAAAA);
+  --accent-glow: rgba(255, 255, 255, 0.1);
+
+  /* Status Colors (Muted) */
+  --status-pending: rgba(255, 255, 255, 0.1);
+  --status-pending-text: #AAAAAA;
+  --status-matched: rgba(255, 255, 255, 0.15);
+  --status-matched-text: #E0E0E0;
+  --status-claimed: rgba(255, 255, 255, 0.2);
+  --status-claimed-text: #FFFFFF;
+
+  /* Typography */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Spacing & Layout */
+  --radius-lg: 0px;
+  /* Industrial precision */
+  --radius-md: 0px;
+  --radius-sm: 0px;
+  --btn-radius: 48px;
+  /* Pill shapes for buttons */
+  --container-width: 1280px;
+
+  /* Shadows & Effects */
+  --shadow-glow: none;
+  --shadow-glass: none;
+}
+
+/* Base Setup */
+body.website-layout {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Grain Overlay */
+body.website-layout::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Typography Enhancements */
+.website-layout h1,
+.website-layout h2,
+.website-layout h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.text-gradient {
+  color: var(--text-main);
+  /* override gradient to plain white for aesthetic */
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+/* Container */
+.web-container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* --- Navigation --- */
+.web-navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.web-navbar:hover {
+  background: var(--bg-dark);
+}
+
+.web-navbar .web-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.web-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: var(--text-main);
+}
+
+.web-logo {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--text-main);
+  border-radius: 50%;
+  position: relative;
+}
+
+.web-logo::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--text-main);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.web-brand-text {
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.web-brand-text span {
+  color: var(--text-muted) !important;
+}
+
+.web-nav-links {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.web-nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 300;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.web-nav-link:hover,
+.web-nav-link.active {
+  color: var(--text-main);
+}
+
+.web-profile-menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.web-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 300;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.web-avatar:hover {
+  border-color: var(--text-main);
+}
+
+/* --- Main Layout Adjustments --- */
+.web-main {
+  padding-top: 64px;
+  padding-bottom: 120px;
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .web-nav-links {
+    display: none;
+  }
+}
+
+/* --- Precision Cards --- */
+.web-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  position: relative;
+  transition: border-color 0.4s ease;
+}
+
+/* Crosshairs for cards */
+.web-card::before,
+.web-card::after {
+  content: '+';
+  position: absolute;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.web-card::before {
+  top: 8px;
+  left: 8px;
+}
+
+.web-card::after {
+  bottom: 8px;
+  right: 8px;
+}
+
+.web-card-hoverable:hover {
+  border-color: var(--text-main);
+}
+
+/* --- Precision Buttons --- */
+.web-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 32px;
+  border-radius: var(--btn-radius);
+  font-weight: 300;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.web-btn-primary {
+  background: var(--text-main);
+  color: var(--bg-dark);
+  border: 1px solid var(--text-main);
+}
+
+.web-btn-primary:hover {
+  background: transparent;
+  color: var(--text-main);
+}
+
+.web-btn-glass:hover {
+  border-color: var(--text-main);
+}
+
+/* --- Precision Inputs --- */
+.web-input,
+.web-select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-main);
+  padding: 16px 0;
+  border-radius: 0;
+  outline: none;
+  font-family: inherit;
+  font-weight: 300;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.web-input:focus,
+.web-select:focus {
+  border-color: var(--text-main);
+}
+
+.web-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  background-size: 16px;
+  padding-right: 24px;
+}
+
+.web-select option {
+  background: var(--bg-dark);
+  color: var(--text-main);
+}
+
+/* --- Micro-Interactions & Animations --- */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+
+/* --- Custom File Upload Dropzone --- */
+.web-dropzone {
+  border: 1px dashed var(--card-border);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.web-dropzone:hover,
+.web-dropzone.dragover {
+  border-color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.web-dropzone input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

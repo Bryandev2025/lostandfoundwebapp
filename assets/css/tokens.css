@@ -1,0 +1,23 @@
+:root{
+  --bg: #0b1220;
+  --panel: rgba(255,255,255,.06);
+  --panel-2: rgba(255,255,255,.09);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.64);
+  --border: rgba(255,255,255,.10);
+  --brand: #7c3aed;
+  --brand-2: #22c55e;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  --shadow: 0 18px 60px rgba(0,0,0,.35);
+  --shadow-soft: 0 10px 30px rgba(0,0,0,.22);
+
+  --gap: 14px;
+  --container: 1180px;
+
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}

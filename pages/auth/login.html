@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <title>Lost & Found — Login</title>
+</head>
+
+<body>
+    <div class="container" style="max-width:520px; padding-top:64px;">
+        <div class="card" style="padding:22px;">
+            <h2 style="margin:0 0 8px 0;">Welcome back</h2>
+            <p style="margin:0 0 18px 0; color:var(--muted);">Login to continue.</p>
+
+            <div class="grid">
+                <input class="input" id="email" type="email" placeholder="Email">
+                <input class="input" id="password" type="password" placeholder="Password">
+                <button class="btn primary" id="btnLogin">Login</button>
+                <a href="/pages/auth/register.html" style="color:var(--muted); text-decoration:none;">Create account</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { api } from "/core/api.js";
+        import { setAuth, getToken, redirectByRole } from "/core/auth.js";
+        import { toast } from "/components/toast.js";
+
+        // If already logged in, go straight to the correct area
+        if (getToken()) {
+            redirectByRole();
+        }
+
+        document.getElementById("btnLogin").addEventListener("click", async () => {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                toast("Email and password are required.", "warn");
+                return;
+            }
+
+            try {
+                const data = await api.post("/auth/login", { email, password });
+
+                setAuth(data.token, data.user);
+                toast("Login successful.", "success");
+
+                // Smart role redirect (admin/staff/user)
+                redirectByRole(data.user);
+
+            } catch (e) {
+                // api.js usually throws with message already
+                toast("Invalid credentials or server error.", "danger");
+            }
+        });
+    </script>
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

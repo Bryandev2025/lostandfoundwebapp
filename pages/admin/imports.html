@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Admin — Imports</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="grid cols-3">
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:900;">Imports</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Upload CSV/XLSX to bulk-create items for records and testing.
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding:14px;">
+                            <div style="font-weight:800;">Template</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Columns usually include: type, title, description, category, brand, color, location,
+                                date_incident.
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <div style="font-weight:900;">Admin Only</div>
+                                <div style="color:var(--muted); font-size:12px;">Bulk uploads</div>
+                            </div>
+                            <button class="btn ghost" id="btnClear">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="grid cols-2" style="margin-top:16px; align-items:start;">
+
+                        <!-- Upload Panel -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Upload File</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                Supported: .csv, .xlsx. Max size depends on server config.
+                            </div>
+
+                            <div style="margin-top:12px;">
+                                <input id="file" type="file" class="input" accept=".csv,.xlsx,.xls" />
+                            </div>
+
+                            <div id="fileMeta" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="btn primary" id="btnUpload">Import Items</button>
+                                <button class="btn ghost" id="btnDownloadSample">Download Sample CSV</button>
+                            </div>
+
+                            <div id="uploadState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+
+                            <div id="progressWrap" class="card"
+                                style="display:none; margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-weight:800;">Uploading…</div>
+                                    <div id="progressText" style="color:var(--muted); font-size:12px;">0%</div>
+                                </div>
+                                <div
+                                    style="margin-top:10px; height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden;">
+                                    <div id="progressBar"
+                                        style="height:100%; width:0%; background:linear-gradient(135deg, var(--brand), #4f46e5);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Panel -->
+                        <div class="card" style="padding:16px;">
+                            <div style="font-weight:900;">Import Result</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                After upload, the server response summary will appear here.
+                            </div>
+
+                            <div id="result" class="card"
+                                style="margin-top:12px; padding:14px; background:rgba(255,255,255,.04);">
+                                <div style="color:var(--muted); font-size:13px;">No import yet.</div>
+                            </div>
+
+                            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="btn ghost" id="btnGoItems">Browse Items</button>
+                                <button class="btn ghost" id="btnGoExports">Exports</button>
+                                <button class="btn ghost" id="btnGoLogs">Logs</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { requireAuth, requireRole } from "/core/auth.js";
+        import { API } from "/core/api.js";
+        import { getToken } from "/core/auth.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        requireRole("admin");
+        mountSidebar("admin");
+        mountTopbar();
+
+        document.getElementById("btnGoItems").onclick = () => location.href = "/pages/user/items.html";
+        document.getElementById("btnGoExports").onclick = () => location.href = "/pages/admin/exports.html";
+        document.getElementById("btnGoLogs").onclick = () => location.href = "/pages/admin/logs.html";
+
+        const fileEl = document.getElementById("file");
+        const fileMeta = document.getElementById("fileMeta");
+        const uploadState = document.getElementById("uploadState");
+        const resultEl = document.getElementById("result");
+
+        const progressWrap = document.getElementById("progressWrap");
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+
+        document.getElementById("btnClear").onclick = () => {
+            fileEl.value = "";
+            fileMeta.textContent = "";
+            uploadState.textContent = "";
+            resultEl.innerHTML = `<div style="color:var(--muted); font-size:13px;">No import yet.</div>`;
+            progressWrap.style.display = "none";
+            progressBar.style.width = "0%";
+            progressText.textContent = "0%";
+        };
+
+        fileEl.addEventListener("change", () => {
+            const f = fileEl.files?.[0];
+            if (!f) return;
+
+            fileMeta.textContent = `${f.name} • ${(f.size / 1024 / 1024).toFixed(2)} MB`;
+            uploadState.textContent = "";
+        });
+
+        // Download a sample CSV locally (no server needed)
+        document.getElementById("btnDownloadSample").onclick = () => {
+            const csv =
+                `type,title,description,category,brand,color,location,date_incident
+lost,Black Wallet,"Leather wallet with ID inside",Personal,,Black,Library,2026-03-01
+found,USB Flash Drive,"16GB with keychain",Electronics,,Blue,Lab 2,2026-03-01`;
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "items-import-sample.csv";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+            toast("Sample CSV downloaded.", "success");
+        };
+
+        function setProgress(pct) {
+            const p = Math.max(0, Math.min(100, pct));
+            progressWrap.style.display = "block";
+            progressBar.style.width = `${p}%`;
+            progressText.textContent = `${p}%`;
+        }
+
+        function renderResult(payload) {
+            // Expecting something like:
+            // { message, imported, failed, errors: [...] }
+            const msg = payload.message ?? "Import completed.";
+            const imported = payload.imported ?? payload.inserted ?? payload.success ?? null;
+            const failed = payload.failed ?? payload.errors_count ?? null;
+            const errors = payload.errors ?? payload.failures ?? [];
+
+            resultEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:900;">${msg}</div>
+            <div style="color:var(--muted); font-size:12px; margin-top:6px;">
+              Review summary and proceed to browse items.
+            </div>
+          </div>
+          <span style="padding:6px 10px; border-radius:999px; border:1px solid rgba(34,197,94,.28); background:rgba(34,197,94,.12); font-size:12px;">
+            Done
+          </span>
+        </div>
+
+        <div class="grid cols-2" style="margin-top:12px;">
+          <div class="card" style="padding:12px; background:rgba(255,255,255,.03);">
+            <div style="color:var(--muted); font-size:12px;">Imported</div>
+            <div style="font-weight:950; font-size:22px; margin-top:6px;">${imported ?? "—"}</div>
+          </div>
+          <div class="card" style="padding:12px; background:rgba(255,255,255,.03);">
+            <div style="color:var(--muted); font-size:12px;">Failed</div>
+            <div style="font-weight:950; font-size:22px; margin-top:6px;">${failed ?? (Array.isArray(errors) ? errors.length : "—")}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="font-weight:800;">Errors (if any)</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:6px;">
+            If your backend returns validation failures, they will appear here.
+          </div>
+
+          <div class="card" style="margin-top:10px; padding:12px; background:rgba(255,255,255,.03);">
+            ${Array.isArray(errors) && errors.length
+                    ? `<ul style="margin:0; padding-left:18px; color:var(--muted); font-size:13px;">
+                  ${errors.slice(0, 8).map(e => `<li>${typeof e === "string" ? e : JSON.stringify(e)}</li>`).join("")}
+                </ul>
+                ${errors.length > 8 ? `<div style="color:var(--muted); font-size:12px; margin-top:8px;">+${errors.length - 8} more…</div>` : ""}`
+                    : `<div style="color:var(--muted); font-size:13px;">No errors returned.</div>`
+                }
+          </div>
+        </div>
+      `;
+        }
+
+        // Upload with progress using XHR (fetch has no reliable upload progress)
+        document.getElementById("btnUpload").onclick = async () => {
+            const f = fileEl.files?.[0];
+            if (!f) return toast("Please choose a CSV/XLSX file.", "warn");
+
+            const ext = (f.name.split(".").pop() || "").toLowerCase();
+            if (!["csv", "xlsx", "xls"].includes(ext)) {
+                return toast("Invalid file type. Use CSV/XLSX.", "warn");
+            }
+
+            uploadState.textContent = "Uploading…";
+            setProgress(0);
+
+            const token = getToken();
+            if (!token) {
+                toast("Session expired. Please login again.", "warn");
+                location.href = "/pages/auth/login.html";
+                return;
+            }
+
+            const fd = new FormData();
+            fd.append("file", f);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", `${API.baseUrl}/imports/items`, true);
+            xhr.setRequestHeader("Accept", "application/json");
+            xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+
+            xhr.upload.onprogress = (evt) => {
+                if (!evt.lengthComputable) return;
+                const pct = Math.round((evt.loaded / evt.total) * 100);
+                setProgress(pct);
+            };
+
+            xhr.onload = () => {
+                try {
+                    const contentType = xhr.getResponseHeader("content-type") || "";
+                    const isJson = contentType.includes("application/json");
+                    const payload = isJson ? JSON.parse(xhr.responseText || "{}") : { message: "Import finished (non-json response)" };
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        uploadState.textContent = "Import completed.";
+                        setProgress(100);
+                        renderResult(payload);
+                        toast("Import successful.", "success");
+                    } else {
+                        uploadState.textContent = payload.message || "Import failed.";
+                        setProgress(0);
+                        toast(uploadState.textContent, "danger");
+                    }
+                } catch (e) {
+                    uploadState.textContent = "Import failed (invalid response).";
+                    setProgress(0);
+                    toast(uploadState.textContent, "danger");
+                }
+            };
+
+            xhr.onerror = () => {
+                uploadState.textContent = "Network error during upload.";
+                setProgress(0);
+                toast(uploadState.textContent, "danger");
+            };
+
+            xhr.send(fd);
+        };
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

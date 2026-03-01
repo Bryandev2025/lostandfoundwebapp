@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost and Found System - Initializing</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader"></div>
+
+    <script type="module">
+        import { getToken, getUser, redirectByRole } from "/core/auth.js";
+
+        // Simple router: If user is at root, check if they are logged in
+        // and redirect to their specific dashboard based on their role
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = getToken();
+            const user = getUser();
+
+            if (token && user) {
+                redirectByRole(user);
+            } else {
+                window.location.href = "/pages/auth/login.html";
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <title>Staff — Dashboard</title>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar card" id="sidebar"></aside>
+
+        <div class="main">
+            <header class="topbar card" id="topbar"></header>
+
+            <main class="content">
+                <div class="container">
+
+                    <div class="card" style="padding:18px;">
+                        <div
+                            style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <div>
+                                <div style="font-weight:950; font-size:22px;">Staff Dashboard</div>
+                                <div style="color:var(--muted); margin-top:6px;">
+                                    Review claims, match items, generate QR, and print documents.
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="btn ghost" id="btnClaims">Claims Queue</button>
+                                <button class="btn ghost" id="btnMatch">Match Items</button>
+                                <button class="btn ghost" id="btnQR">QR Tools</button>
+                                <button class="btn primary" id="btnPrint">Print Center</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid cols-3" style="margin-top:16px;">
+                        <div class="card" style="padding:16px;">
+                            <div style="color:var(--muted); font-size:12px;">Pending Claims</div>
+                            <div id="kClaims" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+                            <div style="color:var(--muted); font-size:12px; margin-top:10px;">Waiting for review</div>
+                        </div>
+
+                        <div class="card" style="padding:16px;">
+                            <div style="color:var(--muted); font-size:12px;">Pending Items</div>
+                            <div id="kItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+                            <div style="color:var(--muted); font-size:12px; margin-top:10px;">Ready for matching</div>
+                        </div>
+
+                        <div class="card" style="padding:16px;">
+                            <div style="color:var(--muted); font-size:12px;">Matched Items</div>
+                            <div id="kMatched" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
+                            <div style="color:var(--muted); font-size:12px; margin-top:10px;">Possible pairs</div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding:14px; margin-top:16px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-weight:900;">Quick Checklist (Defense)</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    Use this page during demo to show requirements quickly.
+                                </div>
+                            </div>
+                            <button class="btn success" id="btnRefresh">Refresh</button>
+                        </div>
+
+                        <div class="grid cols-2" style="margin-top:12px;">
+                            <div class="card" style="padding:14px; background:rgba(255,255,255,.04);">
+                                <div style="font-weight:800;">Claims Workflow</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    Pending → Approve/Deny → Release → Print Slip
+                                </div>
+                            </div>
+
+                            <div class="card" style="padding:14px; background:rgba(255,255,255,.04);">
+                                <div style="font-weight:800;">Matching Workflow</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                    Lost + Found → Match → Notify/Claim
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { mountSidebar } from "/components/sidebar.js";
+        import { mountTopbar } from "/components/topbar.js";
+        import { guardPage } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        guardPage();
+        mountSidebar();
+        mountTopbar();
+
+        document.getElementById("btnClaims").onclick = () => location.href = "/pages/staff/claims.html";
+        document.getElementById("btnMatch").onclick = () => location.href = "/pages/staff/match.html";
+        document.getElementById("btnQR").onclick = () => location.href = "/pages/staff/qr.html";
+        document.getElementById("btnPrint").onclick = () => location.href = "/pages/staff/prints.html";
+        document.getElementById("btnRefresh").onclick = () => loadAll();
+
+        const kClaims = document.getElementById("kClaims");
+        const kItems = document.getElementById("kItems");
+        const kMatched = document.getElementById("kMatched");
+
+        function normalizePaginator(payload) {
+            if (payload && typeof payload === "object" && Array.isArray(payload.data)) return payload;
+            return { data: Array.isArray(payload) ? payload : [], total: payload?.length ?? 0 };
+        }
+
+        async function getTotal(path) {
+            try {
+                const payload = await api.get(path);
+                const p = normalizePaginator(payload);
+                return typeof p.total === "number" ? p.total : (p.data?.length ?? 0);
+            } catch {
+                return null;
+            }
+        }
+
+        async function loadAll() {
+            toast("Refreshing…", "info");
+
+            const [claims, items, matched] = await Promise.all([
+                getTotal("/claims?status=pending&per_page=1"),
+                getTotal("/items?status=pending&per_page=1"),
+                getTotal("/items?status=matched&per_page=1"),
+            ]);
+
+            kClaims.textContent = claims ?? "—";
+            kItems.textContent = items ?? "—";
+            kMatched.textContent = matched ?? "—";
+
+            toast("Updated.", "success");
+        }
+
+        loadAll();
+    </script>
+
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>
