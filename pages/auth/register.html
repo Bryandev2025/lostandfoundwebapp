@@ -6,53 +6,80 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="/assets/css/tokens.css">
     <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
     <title>Lost & Found — Register</title>
 </head>
 
-<body>
-    <div class="container" style="max-width:520px; padding-top:64px;">
-        <div class="card" style="padding:22px;">
-            <h2 style="margin:0 0 8px 0;">Create an account</h2>
-            <p style="margin:0 0 18px 0; color:var(--muted);">Fill out the details below to register.</p>
-
-            <form id="registerForm" class="grid" onsubmit="event.preventDefault();">
-                <div>
-                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Full
-                        Name</label>
-                    <input class="input" id="name" type="text" placeholder="John Doe" required style="width:100%;">
-                </div>
-                <div>
-                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Email</label>
-                    <input class="input" id="email" type="email" placeholder="john@example.com" required
-                        style="width:100%;">
-                </div>
-                <div>
-                    <label
-                        style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Password</label>
-                    <input class="input" id="password" type="password" placeholder="Min. 8 characters" required
-                        style="width:100%;">
-                </div>
-                <div>
-                    <label style="display:block; margin-bottom:4px; font-size:13px; color:var(--muted);">Confirm
-                        Password</label>
-                    <input class="input" id="password_confirmation" type="password" placeholder="Confirm your password"
-                        required style="width:100%;">
-                </div>
-
-                <button class="btn primary" id="btnRegister" style="margin-top:8px;">Sign Up</button>
-                <div style="text-align:center; margin-top:12px;">
-                    <a href="/pages/auth/login.html"
-                        style="color:var(--muted); text-decoration:none; font-size:14px;">Already have an account?
-                        Login</a>
-                </div>
-            </form>
+<body class="website-layout web-bg-animated">
+    <!-- Premium Navbar replacements -->
+    <nav class="web-navbar">
+        <div class="web-container">
+            <a href="/" class="web-brand">
+                <div class="web-logo"></div>
+                <div class="web-brand-text">Lost<span>&</span>Found</div>
+            </a>
+            <div class="web-nav-links">
+                <a href="/pages/auth/login.html" class="web-nav-link">Login Instead</a>
+            </div>
         </div>
-    </div>
+    </nav>
+
+    <main class="web-main"
+        style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 200px);">
+        <div class="web-container animate-in stagger-1" style="width: 100%; max-width: 520px; padding: 0 20px;">
+            <div class="web-card web-card-hoverable" style="padding: 40px;">
+                <h2 style="margin: 0 0 8px 0; font-size: 2rem;">Create <span class="text-gradient">Account</span></h2>
+                <p style="margin: 0 0 32px 0; color: var(--text-muted); font-size: 1rem; line-height: 1.5;">Join the
+                    network to report and claim items.</p>
+
+                <form id="registerForm" class="grid" onsubmit="event.preventDefault();" style="gap: 24px;">
+                    <div class="animate-in stagger-2">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Full
+                            Name</label>
+                        <input class="web-input" id="name" type="text" placeholder="John Doe" required
+                            style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+                    <div class="animate-in stagger-3">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Email
+                            Address</label>
+                        <input class="web-input" id="email" type="email" placeholder="john@example.com" required
+                            style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+                    <div class="animate-in stagger-4">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Password</label>
+                        <input class="web-input" id="password" type="password" placeholder="Min. 8 characters" required
+                            style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+                    <div class="animate-in" style="animation-delay: 0.5s;">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Confirm
+                            Password</label>
+                        <input class="web-input" id="password_confirmation" type="password"
+                            placeholder="Confirm your password" required style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+
+                    <div class="animate-in" style="animation-delay: 0.6s; margin-top: 16px;">
+                        <button class="web-btn web-btn-primary" id="btnRegister" style="width: 100%;">Create
+                            Account</button>
+                    </div>
+                    <div class="animate-in" style="animation-delay: 0.6s; text-align: center; margin-top: 16px;">
+                        <a href="/pages/auth/login.html"
+                            style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.5px; transition: color 0.3s ease;"
+                            onmouseover="this.style.color='var(--text-main)'"
+                            onmouseout="this.style.color='var(--text-muted)'">Already have an account? Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
 
     <script type="module">
         import { api } from "/core/api.js";
         import { setAuth, getToken, redirectByRole } from "/core/auth.js";
-        import { toast } from "/components/toast.js";
+        import { toast } from "/components/toast_v2.js";
         import { ui } from "/core/ui.js";
 
         // Redirect if already logged in
@@ -98,7 +125,7 @@
             }
         });
     </script>
-    <script type="module" src="/components/toast.js"></script>
+    <script type="module" src="/components/toast_v2.js"></script>
 </body>
 
 </html>

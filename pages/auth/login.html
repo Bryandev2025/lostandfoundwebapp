@@ -6,28 +6,72 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="/assets/css/tokens.css">
     <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
     <title>Lost & Found — Login</title>
 </head>
 
-<body>
-    <div class="container" style="max-width:520px; padding-top:64px;">
-        <div class="card" style="padding:22px;">
-            <h2 style="margin:0 0 8px 0;">Welcome back</h2>
-            <p style="margin:0 0 18px 0; color:var(--muted);">Login to continue.</p>
-
-            <div class="grid">
-                <input class="input" id="email" type="email" placeholder="Email">
-                <input class="input" id="password" type="password" placeholder="Password">
-                <button class="btn primary" id="btnLogin">Login</button>
-                <a href="/pages/auth/register.html" style="color:var(--muted); text-decoration:none;">Create account</a>
+<body class="website-layout web-bg-animated">
+    <!-- Premium Navbar replacements -->
+    <nav class="web-navbar">
+        <div class="web-container">
+            <a href="/" class="web-brand">
+                <div class="web-logo"></div>
+                <div class="web-brand-text">Lost<span>&</span>Found</div>
+            </a>
+            <div class="web-nav-links">
+                <a href="/pages/auth/register.html" class="web-nav-link">Create Account</a>
             </div>
         </div>
-    </div>
+    </nav>
+
+    <main class="web-main"
+        style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 200px);">
+        <div class="web-container animate-in stagger-1" style="width: 100%; max-width: 480px; padding: 0 20px;">
+            <div class="web-card web-card-hoverable" style="padding: 40px;">
+                <h2 style="margin: 0 0 8px 0; font-size: 2rem;">Welcome <span class="text-gradient">back</span></h2>
+                <p style="margin: 0 0 32px 0; color: var(--text-muted); font-size: 1rem; line-height: 1.5;">Login to
+                    your account to continue.</p>
+
+                <div class="grid" style="gap: 24px;">
+                    <div class="animate-in stagger-2">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Email
+                            Address</label>
+                        <input class="web-input" id="email" type="email" placeholder="Enter your email"
+                            style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+                    <div class="animate-in stagger-3">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Password</label>
+                        <input class="web-input" id="password" type="password" placeholder="Enter your password"
+                            style="font-size: 1rem; padding: 12px 0;">
+                    </div>
+                    <div class="animate-in stagger-4" style="margin-top: 8px; display: flex; align-items: center;">
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+                            <input type="checkbox" id="rememberMe" checked
+                                style="accent-color: var(--text-main); width: 16px; height: 16px; cursor: pointer;">
+                            Remember Me
+                        </label>
+                    </div>
+                    <div class="animate-in stagger-4" style="margin-top: 16px;">
+                        <button class="web-btn web-btn-primary" id="btnLogin" style="width: 100%;">Secure Login</button>
+                    </div>
+                    <div class="animate-in stagger-4" style="text-align: center; margin-top: 16px;">
+                        <a href="/pages/auth/register.html"
+                            style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.5px; transition: color 0.3s ease;"
+                            onmouseover="this.style.color='var(--text-main)'"
+                            onmouseout="this.style.color='var(--text-muted)'">Don't have an account? Create one</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script type="module">
         import { api } from "/core/api.js";
         import { setAuth, getToken, redirectByRole } from "/core/auth.js";
-        import { toast } from "/components/toast.js";
+        import { toast } from "/components/toast_v2.js";
 
         // If already logged in, go straight to the correct area
         if (getToken()) {
@@ -37,6 +81,7 @@
         document.getElementById("btnLogin").addEventListener("click", async () => {
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
+            const remember = document.getElementById("rememberMe").checked;
 
             if (!email || !password) {
                 toast("Email and password are required.", "warn");
@@ -46,7 +91,7 @@
             try {
                 const data = await api.post("/auth/login", { email, password });
 
-                setAuth(data.token, data.user);
+                setAuth(data.token, data.user, remember);
                 toast("Login successful.", "success");
 
                 // Smart role redirect (admin/staff/user)
@@ -58,7 +103,7 @@
             }
         });
     </script>
-    <script type="module" src="/components/toast.js"></script>
+    <script type="module" src="/components/toast_v2.js"></script>
 </body>
 
 </html>

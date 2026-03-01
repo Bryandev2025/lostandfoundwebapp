@@ -389,3 +389,24 @@ body.website-layout::before {
   opacity: 0;
   cursor: pointer;
 }
+
+/* --- Animated Background Enhancements --- */
+.web-bg-animated {
+  background: linear-gradient(-45deg, #10061c, #3f276e, #1c4573, #0a1121);
+  background-size: 400% 400%;
+  animation: bgGradientShift 12s ease infinite;
+}
+
+@keyframes bgGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}

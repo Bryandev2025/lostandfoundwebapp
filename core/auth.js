@@ -1,23 +1,30 @@
 const KEY_TOKEN = "lf_token";
 const KEY_USER = "lf_user";
 
-export function setAuth(token, user) {
-    localStorage.setItem(KEY_TOKEN, token);
-    localStorage.setItem(KEY_USER, JSON.stringify(user));
+export function setAuth(token, user, remember = true) {
+    if (remember) {
+        localStorage.setItem(KEY_TOKEN, token);
+        localStorage.setItem(KEY_USER, JSON.stringify(user));
+    } else {
+        sessionStorage.setItem(KEY_TOKEN, token);
+        sessionStorage.setItem(KEY_USER, JSON.stringify(user));
+    }
 }
 
 export function getToken() {
-    return localStorage.getItem(KEY_TOKEN);
+    return localStorage.getItem(KEY_TOKEN) || sessionStorage.getItem(KEY_TOKEN);
 }
 
 export function getUser() {
-    const raw = localStorage.getItem(KEY_USER);
+    const raw = localStorage.getItem(KEY_USER) || sessionStorage.getItem(KEY_USER);
     return raw ? JSON.parse(raw) : null;
 }
 
 export function clearAuth() {
     localStorage.removeItem(KEY_TOKEN);
     localStorage.removeItem(KEY_USER);
+    sessionStorage.removeItem(KEY_TOKEN);
+    sessionStorage.removeItem(KEY_USER);
 }
 
 export function requireAuth() {
