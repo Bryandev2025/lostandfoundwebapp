@@ -23,18 +23,77 @@ export function mountPageLoader() {
 
     // Insert animated content (Apple-esque loader)
     loader.innerHTML = `
-    <div style="display:flex; flex-direction:column; align-items:center; opacity:0; animation: fade-in 0.4s ease forwards; animation-delay: 0.1s;">
-      <svg class="loader-spinner" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary, #1C1C1A)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; animation: spin 1.2s linear infinite;">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-      </svg>
-      <div style="font-family: var(--font-display, Inter, sans-serif); font-weight: 500; letter-spacing:-0.01em; color: var(--text-main, #1C1C1A); font-size: 1.1rem; display:flex; gap: 4px; align-items:flex-end;">
-        <span style="display:inline-block; font-weight: 700;">Lost</span>
-        <span style="display:inline-block; color:var(--text-muted, #73736E); font-weight: 400;">&</span>
-        <span style="display:inline-block; font-weight: 700;">Found</span>
+    <div class="brand-loader">
+      <div class="loader-text">
+        <span class="word l">Lost</span>
+        <span class="word a">&</span>
+        <span class="word f">Found</span>
+      </div>
+      <div class="loader-progress">
+        <div class="loader-progress-bar"></div>
       </div>
     </div>
     <style>
-      @keyframes spin { 100% { transform: rotate(360deg); } }
+      .brand-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        opacity: 0;
+        animation: fade-in 0.4s ease forwards;
+        animation-delay: 0.1s;
+      }
+      .loader-text {
+        font-family: var(--font-display, Inter, sans-serif);
+        font-size: 2.2rem;
+        letter-spacing: -0.03em;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .loader-text .word {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(12px) scale(0.95);
+        animation: text-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .loader-text .word.l { color: var(--text-main, #1c1c1a); font-weight: 700; animation-delay: 0.1s; }
+      .loader-text .word.a { color: var(--text-muted, #86868b); font-weight: 400; font-size: 1.8rem; animation-delay: 0.25s; }
+      .loader-text .word.f { color: var(--text-main, #1c1c1a); font-weight: 700; animation-delay: 0.4s; }
+      
+      .loader-progress {
+        width: 140px;
+        height: 3px;
+        border-radius: 4px;
+        background: rgba(0,0,0,0.05);
+        overflow: hidden;
+        position: relative;
+        opacity: 0;
+        animation: fade-in 0.4s ease forwards;
+        animation-delay: 0.6s;
+      }
+      .loader-progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 40%;
+        background: var(--text-main, #1c1c1a);
+        border-radius: 4px;
+        animation: progress-slide 1.2s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+      }
+      
+      @keyframes text-reveal {
+        to {
+          opacity: 1;
+          filter: blur(0);
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes progress-slide {
+        0% { left: -40%; width: 40%; }
+        100% { left: 100%; width: 80%; }
+      }
       @keyframes fade-in { to { opacity: 1; } }
       .website-layout.loading { overflow: hidden; }
     </style>
