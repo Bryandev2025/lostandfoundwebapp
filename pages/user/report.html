@@ -7,7 +7,83 @@
     <link rel="stylesheet" href="/assets/css/tokens.css">
     <link rel="stylesheet" href="/assets/css/components.css">
     <link rel="stylesheet" href="/assets/css/website.css">
-    <title>Report Lost/Found</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <title>Report Items</title>
+    <style>
+        .high-end-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--input-border, rgba(255, 255, 255, 0.1));
+            border-radius: var(--radius-md, 8px);
+            color: var(--text-main, #fff);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-trigger:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .select-trigger span {
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .select-trigger.selected span {
+            opacity: 1;
+        }
+
+        .select-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: #1c1c1e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md, 8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+        }
+
+        .high-end-select.open .select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .select-options div {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: background 0.2s;
+        }
+
+        .select-options div:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,7 +95,7 @@
             <div
                 style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
                 <div>
-                    <h1 style="font-size: 2.5rem; margin-bottom: 8px;">Report an <span class="text-gradient">Item</span>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 8px;">Report <span class="text-gradient">Items</span>
                     </h1>
                     <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
                         Submit a lost or found report. Add a clear photo to help with verification.
@@ -48,26 +124,60 @@
                                 <label
                                     style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Date
                                     of incident</label>
-                                <input class="web-input" id="date_incident" type="date" />
+                                <input class="web-input" id="date_incident" placeholder="Select Date..." />
                             </div>
                         </div>
 
                         <div>
                             <label
                                 style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Title</label>
-                            <input class="web-input" id="title" placeholder="e.g., Black Wallet, iPhone 13, Umbrella" />
+                            <input class="web-input" id="title"
+                                placeholder="e.g., Black Leather Wallet, iPhone 13 Pro" />
                         </div>
 
                         <div class="grid cols-2" style="gap: 16px;">
                             <div>
                                 <label
                                     style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Category</label>
-                                <input class="web-input" id="category" placeholder="e.g., Electronics, Personal, ID" />
+                                <div class="high-end-select" id="catSelect">
+                                    <div class="select-trigger"><span id="catDisplay">Select Category...</span> <svg
+                                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path d="M6 9l6 6 6-6" />
+                                        </svg></div>
+                                    <div class="select-options">
+                                        <div data-value="Electronics">Electronics</div>
+                                        <div data-value="Personal Items">Personal Items</div>
+                                        <div data-value="ID & Documents">ID & Documents</div>
+                                        <div data-value="Bags & Wallets">Bags & Wallets</div>
+                                        <div data-value="Clothing">Clothing</div>
+                                        <div data-value="Keys">Keys</div>
+                                        <div data-value="Other">Other</div>
+                                    </div>
+                                    <input type="hidden" id="category" value="" />
+                                </div>
                             </div>
                             <div>
                                 <label
                                     style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.95rem;">Location</label>
-                                <input class="web-input" id="location" placeholder="e.g., Library, Cafeteria" />
+                                <div class="high-end-select" id="locSelect">
+                                    <div class="select-trigger"><span id="locDisplay">Select Location...</span> <svg
+                                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path d="M6 9l6 6 6-6" />
+                                        </svg></div>
+                                    <div class="select-options">
+                                        <div data-value="Main Building">Main Building</div>
+                                        <div data-value="Library">Library</div>
+                                        <div data-value="Cafeteria">Cafeteria</div>
+                                        <div data-value="Gymnasium">Gymnasium</div>
+                                        <div data-value="Science Lab">Science Lab</div>
+                                        <div data-value="Auditorium">Auditorium</div>
+                                        <div data-value="Campus Grounds">Campus Grounds</div>
+                                        <div data-value="Parking Lot">Parking Lot</div>
+                                    </div>
+                                    <input type="hidden" id="location" value="" />
+                                </div>
                             </div>
                         </div>
 
@@ -185,6 +295,54 @@
         requireRole("user", "staff", "admin");
         mountNavbar();
 
+        // Load flatpickr dynamically since it's an external library
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/flatpickr";
+        script.onload = () => {
+            flatpickr("#date_incident", {
+                altInput: true,
+                altFormat: "F j, Y",
+                dateFormat: "Y-m-d",
+                disableMobile: true
+            });
+        };
+        document.head.appendChild(script);
+
+        // Setup custom dropdowns
+        function setupDropdown(selectId) {
+            const selectEl = document.getElementById(selectId);
+            const trigger = selectEl.querySelector('.select-trigger');
+            const hidden = selectEl.querySelector('input');
+            const display = selectEl.querySelector('.select-trigger span');
+            const options = selectEl.querySelectorAll('.select-options div');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // close other
+                document.querySelectorAll('.high-end-select').forEach(el => {
+                    if (el !== selectEl) el.classList.remove('open');
+                });
+                selectEl.classList.toggle('open');
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    const val = opt.getAttribute('data-value');
+                    hidden.value = val;
+                    display.textContent = val;
+                    trigger.classList.add('selected');
+                    selectEl.classList.remove('open');
+                });
+            });
+        }
+
+        setupDropdown('catSelect');
+        setupDropdown('locSelect');
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.high-end-select').forEach(el => el.classList.remove('open'));
+        });
+
         // Elements
         const pillState = document.getElementById("pillState");
         const btnSubmit = document.getElementById("btnSubmit");
@@ -237,6 +395,10 @@
             document.getElementById("date_incident").value = "";
             document.getElementById("title").value = "";
             document.getElementById("category").value = "";
+            document.getElementById("locDisplay").textContent = "Select Location...";
+            document.getElementById("catDisplay").textContent = "Select Category...";
+            document.querySelector('#catSelect .select-trigger').classList.remove('selected');
+            document.querySelector('#locSelect .select-trigger').classList.remove('selected');
             document.getElementById("brand").value = "";
             document.getElementById("color").value = "";
             document.getElementById("location").value = "";

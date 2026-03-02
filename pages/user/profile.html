@@ -1,0 +1,302 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/website.css">
+    <title>My Profile</title>
+    <style>
+        .profile-header {
+            position: relative;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.2) 100%);
+            height: 200px;
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .profile-avatar-wrapper {
+            position: absolute;
+            bottom: -50px;
+            left: 32px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #1c1c1e;
+            padding: 6px;
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #333;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .profile-content {
+            padding: 70px 32px 32px 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="navbar"></nav>
+
+    <main class="web-main">
+        <div class="web-container" style="max-width: 800px;">
+            <div class="web-card" style="padding: 0;">
+                <div class="profile-header">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar" id="avatarDisplay">U</div>
+                    </div>
+                    <div style="position: absolute; right: 24px; bottom: 16px;">
+                        <span id="moodBadge"
+                            style="padding: 6px 16px; border-radius: 999px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); display: none;"></span>
+                    </div>
+                </div>
+
+                <div class="profile-content">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 id="displayName" style="margin: 0 0 4px 0; font-size: 2rem;">Loading...</h1>
+                            <p id="displayEmail" style="color: var(--text-muted); margin: 0;"></p>
+                        </div>
+                        <button class="web-btn web-btn-primary" id="btnEditProfile">Edit Profile</button>
+                    </div>
+
+                    <div style="margin-top: 24px;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--text-muted);">Bio</h3>
+                        <p id="displayBio" style="line-height: 1.6; font-size: 0.95rem;">No bio provided.</p>
+                    </div>
+
+                    <div class="grid cols-2" style="margin-top: 32px; gap: 24px;">
+                        <div
+                            style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div
+                                style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 4px; text-transform: uppercase;">
+                                Relationship</div>
+                            <div id="displayRelationship" style="font-weight: 500;">—</div>
+                        </div>
+                        <div
+                            style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div
+                                style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 4px; text-transform: uppercase;">
+                                Age / Gender</div>
+                            <div id="displayAgeGender" style="font-weight: 500;">—</div>
+                        </div>
+                        <div
+                            style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); grid-column: 1 / -1;">
+                            <div
+                                style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 4px; text-transform: uppercase;">
+                                Address</div>
+                            <div id="displayAddress" style="font-weight: 500;">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div id="backdrop"
+        style="position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:1000; backdrop-filter: blur(4px);">
+    </div>
+    <div id="modal" class="web-card animate-in fade-in" style="
+        position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+        width:min(700px, calc(100vw - 32px));
+        max-height: 90vh; overflow-y: auto;
+        padding:32px; display:none; z-index:1001;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <h2 style="margin: 0;">Edit Profile</h2>
+            <button class="web-btn web-btn-glass" id="btnCloseModal" style="padding: 8px;">Close</button>
+        </div>
+
+        <form id="profileForm" onsubmit="return false">
+            <div class="grid cols-3" style="gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">First Name</label>
+                    <input class="web-input" id="f_firstName" />
+                </div>
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Middle Name</label>
+                    <input class="web-input" id="f_middleName" />
+                </div>
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Last Name</label>
+                    <input class="web-input" id="f_lastName" />
+                </div>
+            </div>
+
+            <div class="grid cols-2" style="gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Age</label>
+                    <input class="web-input" id="f_age" type="number" />
+                </div>
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Gender</label>
+                    <select class="web-input" id="f_gender">
+                        <option value="">Select...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid cols-2" style="gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Relationship Status</label>
+                    <select class="web-input" id="f_relationship">
+                        <option value="">Select...</option>
+                        <option value="Single">Single</option>
+                        <option value="In a relationship">In a relationship</option>
+                        <option value="Engaged">Engaged</option>
+                        <option value="Married">Married</option>
+                        <option value="It's complicated">It's complicated</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="web-label" style="display:block; margin-bottom:6px;">Mood Status</label>
+                    <input class="web-input" id="f_mood" placeholder="e.g. Feeling Happy 😄" />
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label class="web-label" style="display:block; margin-bottom:6px;">Address</label>
+                <input class="web-input" id="f_address" />
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label class="web-label" style="display:block; margin-bottom:6px;">Bio</label>
+                <textarea class="web-input" id="f_bio" rows="4"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px;">
+                <button class="web-btn web-btn-glass" id="btnCancelModal">Cancel</button>
+                <button class="web-btn web-btn-primary" id="btnSaveProfile">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { mountNavbar } from "/components/navbar.js";
+        import { requireAuth } from "/core/auth.js";
+        import { api } from "/core/api.js";
+        import { toast } from "/components/toast.js";
+
+        requireAuth();
+        mountNavbar();
+
+        let currentUser = null;
+
+        async function loadProfile() {
+            try {
+                const user = await api.get('/profile');
+                currentUser = user;
+
+                const p = user.profile || {};
+
+                const fullName = [p.first_name, p.middle_name, p.last_name].filter(Boolean).join(" ") || user.name;
+                document.getElementById('displayName').textContent = fullName;
+                document.getElementById('displayEmail').textContent = user.email;
+                document.getElementById('displayBio').textContent = p.bio || "No bio provided.";
+                document.getElementById('displayRelationship').textContent = p.relationship || "—";
+
+                let ageGender = [];
+                if (p.age) ageGender.push(`${p.age} yrs`);
+                if (p.gender) ageGender.push(p.gender);
+                document.getElementById('displayAgeGender').textContent = ageGender.join(' • ') || "—";
+
+                document.getElementById('displayAddress').textContent = p.address || "—";
+
+                const initial = fullName.slice(0, 1).toUpperCase();
+                document.getElementById('avatarDisplay').textContent = initial;
+
+                const moodBadge = document.getElementById('moodBadge');
+                if (p.mood_status) {
+                    moodBadge.textContent = p.mood_status;
+                    moodBadge.style.display = "inline-block";
+                } else {
+                    moodBadge.style.display = "none";
+                }
+            } catch (err) {
+                toast("Could not load profile", "error");
+            }
+        }
+
+        const backdrop = document.getElementById('backdrop');
+        const modal = document.getElementById('modal');
+
+        function openModal() {
+            const p = currentUser.profile || {};
+            document.getElementById('f_firstName').value = p.first_name || '';
+            document.getElementById('f_middleName').value = p.middle_name || '';
+            document.getElementById('f_lastName').value = p.last_name || '';
+            document.getElementById('f_age').value = p.age || '';
+            document.getElementById('f_gender').value = p.gender || '';
+            document.getElementById('f_relationship').value = p.relationship || '';
+            document.getElementById('f_mood').value = p.mood_status || '';
+            document.getElementById('f_address').value = p.address || '';
+            document.getElementById('f_bio').value = p.bio || '';
+
+            backdrop.style.display = 'block';
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            backdrop.style.display = 'none';
+            modal.style.display = 'none';
+        }
+
+        document.getElementById('btnEditProfile').onclick = openModal;
+        document.getElementById('btnCloseModal').onclick = closeModal;
+        document.getElementById('btnCancelModal').onclick = closeModal;
+
+        document.getElementById('btnSaveProfile').onclick = async () => {
+            const btn = document.getElementById('btnSaveProfile');
+            btn.disabled = true;
+            btn.textContent = "Saving...";
+
+            const payload = {
+                first_name: document.getElementById('f_firstName').value,
+                middle_name: document.getElementById('f_middleName').value,
+                last_name: document.getElementById('f_lastName').value,
+                age: document.getElementById('f_age').value || null,
+                gender: document.getElementById('f_gender').value,
+                relationship: document.getElementById('f_relationship').value,
+                mood_status: document.getElementById('f_mood').value,
+                address: document.getElementById('f_address').value,
+                bio: document.getElementById('f_bio').value,
+            };
+
+            try {
+                await api.post('/profile', payload);
+                toast("Profile updated successfully", "success");
+                closeModal();
+                loadProfile();
+            } catch (e) {
+                toast("Failed to update profile", "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Save Changes";
+            }
+        };
+
+        loadProfile();
+    </script>
+    <script type="module" src="/components/toast.js"></script>
+</body>
+
+</html>

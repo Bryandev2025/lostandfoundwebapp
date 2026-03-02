@@ -20,7 +20,7 @@ export function toast(message, type = "info") {
     const isError = type === "danger";
     const bg = isError ? "rgba(40, 0, 0, 0.85)" : "rgba(0, 0, 0, 0.85)";
     const border = isError ? "1px solid rgba(255, 60, 60, 0.3)" : "1px solid rgba(255, 255, 255, 0.1)";
-    const textColor = isError ? "#ffb3b3" : "var(--text-main)";
+    const textColor = isError ? "#ffb3b3" : "#ffffff";
 
     t.style.background = bg;
     t.style.backdropFilter = "blur(12px)";

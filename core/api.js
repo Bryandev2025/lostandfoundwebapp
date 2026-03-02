@@ -2,7 +2,7 @@ import { getToken, clearAuth } from "./auth.js";
 import { toast } from "../components/toast.js";
 
 export const API = {
-    baseUrl: "https://backend.test/api", // change in one place
+    baseUrl: "https://backend.test/api",
 };
 
 async function request(path, { method = "GET", body = null, isForm = false } = {}) {
@@ -18,7 +18,6 @@ async function request(path, { method = "GET", body = null, isForm = false } = {
         body: body ? (isForm ? body : JSON.stringify(body)) : null,
     });
 
-    // Auto handle expired token
     if (res.status === 401) {
         clearAuth();
         toast("Session expired. Please login again.", "danger");

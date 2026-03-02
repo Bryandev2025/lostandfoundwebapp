@@ -149,9 +149,9 @@
             return `
         <div class="web-card web-card-hoverable animate-in stagger-2" style="padding:0; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; gap:0;">
           
-          <div style="width: 100%; height: 220px; background: rgba(0,0,0,0.5); position: relative; border-bottom: 1px solid var(--card-border); overflow: hidden;">
+            <div style="width: 100%; height: 220px; background: rgba(0,0,0,0.5); position: relative; border-bottom: 1px solid var(--card-border); overflow: hidden;">
             ${img
-                    ? `<img src="${img}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; opacity: 0.9; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />`
+                    ? `<img src="${img}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1d1d1f/white?text=No+Image&font=Inter';" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; opacity: 0.9; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />`
                     : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;">No Image</div>`
                 }
             <div style="position: absolute; top: 16px; left: 16px; display:flex; gap:8px; flex-wrap:wrap;">
@@ -232,10 +232,41 @@
             };
         }
 
-        async function loadPage(url = "/items") {
+        async function loadPage(url = "/items", delay = false) {
             const serverParams = new URLSearchParams();
             if (fType.value) serverParams.set("type", fType.value);
             if (fStatus.value) serverParams.set("status", fStatus.value);
+
+            const listEl = document.getElementById("list");
+            if (delay) {
+                // Skeleton loading
+                listEl.innerHTML = Array(6).fill(`
+                <div class="web-card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; gap:0; animation: pulse 1.5s infinite;">
+                  <div style="width: 100%; height: 220px; background: rgba(255,255,255,0.05);"></div>
+                  <div style="padding: 24px; display: flex; flex-direction: column; flex: 1;">
+                      <div style="height: 24px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 12px; width: 80%;"></div>
+                      <div style="height: 16px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 24px; width: 60%;"></div>
+                      <div style="height: 48px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: auto;"></div>
+                  </div>
+                </div>
+                `).join("");
+
+                // Add pulse animation if not exists
+                if (!document.getElementById("pulseAnim")) {
+                    const style = document.createElement("style");
+                    style.id = "pulseAnim";
+                    style.innerHTML = `
+                        @keyframes pulse {
+                            0% { opacity: 1; }
+                            50% { opacity: 0.5; }
+                            100% { opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                await new Promise(r => setTimeout(r, 3000));
+            }
 
             const full = `${url}${url.includes("?") ? "&" : "?"}${serverParams.toString()}`;
             const payload = await api.get(full);
@@ -254,7 +285,6 @@
 
             document.getElementById("statsCount").textContent = p.total ?? rows.length;
 
-            const listEl = document.getElementById("list");
             if (!rows.length) {
                 listEl.innerHTML = `<div class="web-card" style="padding:32px; grid-column:1/-1; text-align:center;">
           <div style="font-weight:700; font-size: 1.25rem; margin-bottom: 8px;">No results found</div>
@@ -281,20 +311,37 @@
             listEl.querySelectorAll("[data-open]").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const id = btn.getAttribute("data-open");
-                    window.location.href = `/pages/user/item-show.html?id=${encodeURIComponent(id)}`;
+                    window.location.href = `/ pages / user / item - show.html ? id = ${encodeURIComponent(id)} `;
                 });
             });
         }
 
-        document.getElementById("btnApply").addEventListener("click", () => {
+        document.getElementById("btnApply").addEventListener("click", async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<svg style="margin-right: 8px; animation: spin 1s linear infinite;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Searching...`;
+            if (!document.getElementById("spinAnim")) {
+                const style = document.createElement("style");
+                style.id = "spinAnim";
+                style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+                document.head.appendChild(style);
+            }
+            btn.disabled = true;
+
             const params = new URLSearchParams();
             if (fType.value) params.set("type", fType.value);
             if (fStatus.value) params.set("status", fStatus.value);
             if (fSearch.value.trim()) params.set("q", fSearch.value.trim());
-            window.location.search = params.toString();
+            // Update URL without reloading so sharing links works
+            window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+
+            await loadPage("/items", true);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         });
 
-        document.getElementById("btnRefresh").addEventListener("click", () => loadPage("/items"));
+        document.getElementById("btnRefresh").addEventListener("click", () => loadPage("/items", true));
 
         document.getElementById("btnPrev").addEventListener("click", () => {
             if (!window.__prev) return toast("No previous page.", "warn");
