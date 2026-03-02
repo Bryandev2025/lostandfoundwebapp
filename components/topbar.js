@@ -1,5 +1,9 @@
 import { getUser } from "/core/auth.js";
 import { toast } from "/components/toast.js";
+import { mountPageLoader, bindLinkNavigation } from "/components/pageLoader.js";
+
+// Init link blocker early
+bindLinkNavigation();
 
 export function mountTopbar() {
   const el = document.getElementById("topbar");

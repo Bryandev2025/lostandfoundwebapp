@@ -1,6 +1,10 @@
 import { getUser, clearAuth } from "/core/auth.js";
 import { mountFaqBubble } from "/components/faqBubble.js";
 import { toast } from "/components/toast.js";
+import { mountPageLoader, bindLinkNavigation } from "/components/pageLoader.js";
+
+// Init link blocker early
+bindLinkNavigation();
 
 export function mountNavbar() {
   const el = document.getElementById("navbar");
