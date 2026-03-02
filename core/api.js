@@ -21,24 +21,39 @@ async function request(path, { method = "GET", body = null, isForm = false } = {
     // Auto handle expired token
     if (res.status === 401) {
         clearAuth();
-        toast("Session expired. Please login again.", "warn");
+        toast("Session expired. Please login again.", "danger");
         window.location.href = "/pages/auth/login.html";
         return;
     }
 
-    // Handle non-JSON downloads (pdf/excel)
     const contentType = res.headers.get("content-type") || "";
-    if (!contentType.includes("application/json")) return res;
-
-    const data = await res.json();
+    const isJson = contentType.includes("application/json");
 
     if (!res.ok) {
-        const msg = data?.message || "Request failed.";
+        let msg = "Request failed.";
+        if (isJson) {
+            try {
+                const data = await res.json();
+                msg = data?.message || msg;
+
+                if (data?.errors) {
+                    const firstError = Object.values(data.errors)[0][0];
+                    if (firstError) msg = firstError;
+                }
+            } catch (e) { }
+        } else {
+            // Non-JSON error (e.g., 500 HTML page)
+            msg = `Server Error: ${res.status} ${res.statusText}`.trim();
+        }
+
         toast(msg, "danger");
         throw new Error(msg);
     }
 
-    return data;
+    // Handle non-JSON downloads (pdf/excel)
+    if (!isJson) return res;
+
+    return await res.json();
 }
 
 export const api = {

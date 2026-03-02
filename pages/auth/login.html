@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="stylesheet" href="/assets/css/tokens.css">
-    <link rel="stylesheet" href="/assets/css/components.css">
-    <link rel="stylesheet" href="/assets/css/website.css">
+    <link rel="stylesheet" href="../../assets/css/tokens.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="../../assets/css/website.css">
     <title>Lost & Found — Login</title>
 </head>
 
@@ -14,12 +14,12 @@
     <!-- Premium Navbar replacements -->
     <nav class="web-navbar">
         <div class="web-container">
-            <a href="/" class="web-brand">
+            <a href="../../index.html" class="web-brand">
                 <div class="web-logo"></div>
                 <div class="web-brand-text">Lost<span>&</span>Found</div>
             </a>
             <div class="web-nav-links">
-                <a href="/pages/auth/register.html" class="web-nav-link">Create Account</a>
+                <a href="../../pages/auth/register.html" class="web-nav-link">Create Account</a>
             </div>
         </div>
     </nav>
@@ -58,7 +58,7 @@
                         <button class="web-btn web-btn-primary" id="btnLogin" style="width: 100%;">Secure Login</button>
                     </div>
                     <div class="animate-in stagger-4" style="text-align: center; margin-top: 16px;">
-                        <a href="/pages/auth/register.html"
+                        <a href="../../pages/auth/register.html"
                             style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.5px; transition: color 0.3s ease;"
                             onmouseover="this.style.color='var(--text-main)'"
                             onmouseout="this.style.color='var(--text-muted)'">Don't have an account? Create one</a>
@@ -69,9 +69,9 @@
     </main>
 
     <script type="module">
-        import { api } from "/core/api.js";
-        import { setAuth, getToken, redirectByRole } from "/core/auth.js";
-        import { toast } from "/components/toast_v2.js";
+        import { api } from "../../core/api.js";
+        import { setAuth, getToken, redirectByRole } from "../../core/auth.js";
+        import { toast } from "../../components/toast_v2.js";
 
         // If already logged in, go straight to the correct area
         if (getToken()) {
@@ -99,11 +99,11 @@
 
             } catch (e) {
                 // api.js usually throws with message already
-                toast("Invalid credentials or server error.", "danger");
+                console.error("Login failed:", e);
             }
         });
     </script>
-    <script type="module" src="/components/toast_v2.js"></script>
+    <script type="module" src="../../components/toast_v2.js"></script>
 </body>
 
 </html>

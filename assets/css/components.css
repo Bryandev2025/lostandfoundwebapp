@@ -8,12 +8,9 @@ body {
   margin: 0;
   font-family: var(--font);
   background-color: var(--bg);
-  background-image:
-    radial-gradient(1000px circle at 15% 0%, var(--bg-glow-1) 0%, transparent 100%),
-    radial-gradient(1000px circle at 85% 100%, var(--bg-glow-2) 0%, transparent 100%);
-  background-attachment: fixed;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
@@ -38,17 +35,14 @@ h4,
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .card:hover {
   border-color: var(--border-focus);
   box-shadow: var(--shadow);
-  background: #ffffff;
-  /* Lighter on hover */
+  transform: translateY(-2px);
 }
 
 .btn {
@@ -81,20 +75,20 @@ h4,
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .btn.primary {
   background: var(--brand-gradient);
   color: white;
-  /* Important to override the standard dark text for primary buttons */
   border: none;
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn.primary:hover {
-  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.35);
-  filter: brightness(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  filter: brightness(1.2);
   color: white;
 }
 
@@ -145,7 +139,7 @@ select:focus,
 textarea:focus {
   border-color: var(--brand);
   background: #ffffff;
-  box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 0 0 1px var(--brand);
 }
 
 .input::placeholder,

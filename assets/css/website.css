@@ -1,44 +1,44 @@
 :root {
-  /* Ultra-Premium Apple-like Light Mode */
-  --bg-dark: #f5f5f7;
-  --bg-darker: #ffffff;
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: rgba(0, 0, 0, 0.08);
-  --card-border-hover: rgba(0, 0, 0, 0.15);
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(0, 0, 0, 0.05);
+  /* High-End Human-Like Light Mode */
+  --bg-dark: #F9F9F8;
+  --bg-darker: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --card-border: #E8E8E6;
+  --card-border-hover: #1C1C1A;
+  --glass-bg: rgba(255, 255, 255, 0.98);
+  --glass-border: #E8E8E6;
 
-  --text-main: #1d1d1f;
-  --text-muted: #86868b;
+  --text-main: #1C1C1A;
+  --text-muted: #73736E;
 
-  /* Modern Apple Accents */
-  --accent-primary: #0066cc;
-  --accent-secondary: #007aff;
-  --accent-gradient: linear-gradient(135deg, #007aff, #005bb5);
-  --accent-glow: rgba(0, 102, 204, 0.15);
+  /* Modern Solid Accents */
+  --accent-primary: #1C1C1A;
+  --accent-secondary: #4A4A46;
+  --accent-gradient: #1C1C1A;
+  --accent-glow: rgba(0, 0, 0, 0.03);
 
   /* Status Colors */
-  --status-pending: rgba(255, 149, 0, 0.15);
-  --status-pending-text: #ff9500;
-  --status-matched: rgba(88, 86, 214, 0.15);
-  --status-matched-text: #5856d6;
-  --status-claimed: rgba(52, 199, 89, 0.15);
-  --status-claimed-text: #28a745;
+  --status-pending: rgba(217, 133, 0, 0.1);
+  --status-pending-text: #B36B00;
+  --status-matched: rgba(74, 74, 70, 0.1);
+  --status-matched-text: #4A4A46;
+  --status-claimed: rgba(46, 133, 64, 0.1);
+  --status-claimed-text: #2E8540;
 
   /* Typography */
-  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Spacing & Layout */
-  --radius-lg: 24px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
-  --btn-radius: 999px;
-  --container-width: 1240px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --btn-radius: 8px;
+  --container-width: 1140px;
 
   /* Shadows */
-  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  --shadow-glass: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  --shadow-glass: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 /* Base Setup */
@@ -65,10 +65,7 @@ body.website-layout {
 }
 
 .text-gradient {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-main);
   display: inline-block;
 }
 
@@ -86,9 +83,9 @@ body.website-layout {
   left: 0;
   right: 0;
   height: 72px;
-  background: var(--glass-bg);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--glass-border);
   z-index: 100;
   display: flex;
@@ -209,14 +206,12 @@ body.website-layout {
   position: relative;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: var(--shadow-glow);
-  backdrop-filter: saturate(150%) blur(20px);
 }
 
 .web-card-hoverable:hover {
   border-color: var(--card-border-hover);
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08), 0 0 20px rgba(0, 0, 0, 0.02);
-  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glass);
 }
 
 /* --- Premium Buttons --- */
@@ -239,20 +234,19 @@ body.website-layout {
 }
 
 .web-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
 }
 
 .web-btn-primary {
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   color: #ffffff;
   border: none;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25);
+  font-weight: 500;
+  box-shadow: none;
 }
 
 .web-btn-primary:hover {
-  filter: brightness(1.05);
-  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.35);
+  filter: brightness(1.2);
   transform: translateY(-2px);
 }
 
@@ -303,14 +297,12 @@ body.website-layout {
 @keyframes slideUpFade {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.98);
-    filter: blur(4px);
+    transform: translateY(15px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translateY(0);
   }
 }
 
@@ -367,30 +359,4 @@ body.website-layout {
 /* --- Background Glow Orbs --- */
 .web-bg-animated {
   background-color: var(--bg-dark);
-}
-
-.web-bg-animated::before {
-  content: '';
-  position: fixed;
-  top: -20%;
-  left: -10%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(0, 102, 204, 0.08) 0%, transparent 60%);
-  z-index: -1;
-  pointer-events: none;
-  filter: blur(60px);
-}
-
-.web-bg-animated::after {
-  content: '';
-  position: fixed;
-  bottom: -20%;
-  right: -10%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(88, 86, 214, 0.08) 0%, transparent 60%);
-  z-index: -1;
-  pointer-events: none;
-  filter: blur(60px);
 }
