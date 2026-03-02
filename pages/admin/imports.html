@@ -21,14 +21,14 @@
                 <div class="container">
 
                     <div class="grid cols-3">
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:900;">Imports</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Upload CSV/XLSX to bulk-create items for records and testing.
                             </div>
                         </div>
 
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:800;">Template</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Columns usually include: type, title, description, category, brand, color, location,
@@ -37,7 +37,7 @@
                         </div>
 
                         <div class="card"
-                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
                                 <div style="font-weight:900;">Admin Only</div>
                                 <div style="color:var(--muted); font-size:12px;">Bulk uploads</div>
@@ -46,22 +46,23 @@
                         </div>
                     </div>
 
-                    <div class="grid cols-2" style="margin-top:16px; align-items:start;">
+                    <div class="grid cols-2 animate-in stagger-2" style="margin-top:24px; align-items:start;">
 
                         <!-- Upload Panel -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Upload File</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Upload File</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 Supported: .csv, .xlsx. Max size depends on server config.
                             </div>
 
-                            <div style="margin-top:12px;">
-                                <input id="file" type="file" class="input" accept=".csv,.xlsx,.xls" />
+                            <div style="margin-top:20px;">
+                                <input id="file" type="file" class="web-input"
+                                    style="background: rgba(0,0,0,0.02); height: auto;" accept=".csv,.xlsx,.xls" />
                             </div>
 
                             <div id="fileMeta" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
-                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                            <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                                 <button class="btn primary" id="btnUpload">Import Items</button>
                                 <button class="btn ghost" id="btnDownloadSample">Download Sample CSV</button>
                             </div>
@@ -69,13 +70,13 @@
                             <div id="uploadState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
                             <div id="progressWrap" class="card"
-                                style="display:none; margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                                style="display:none; margin-top:20px; padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div style="font-weight:800;">Uploading…</div>
                                     <div id="progressText" style="color:var(--muted); font-size:12px;">0%</div>
                                 </div>
                                 <div
-                                    style="margin-top:10px; height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden;">
+                                    style="margin-top:10px; height:10px; border-radius:999px; background:rgba(0,0,0,.05); overflow:hidden;">
                                     <div id="progressBar"
                                         style="height:100%; width:0%; background:linear-gradient(135deg, var(--brand), #4f46e5);">
                                     </div>
@@ -84,21 +85,23 @@
                         </div>
 
                         <!-- Result Panel -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Import Result</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Import Result</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 After upload, the server response summary will appear here.
                             </div>
 
                             <div id="result" class="card"
-                                style="margin-top:12px; padding:14px; background:rgba(255,255,255,.04);">
+                                style="margin-top:20px; padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="color:var(--muted); font-size:13px;">No import yet.</div>
                             </div>
 
-                            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-                                <button class="btn ghost" id="btnGoItems">Browse Items</button>
-                                <button class="btn ghost" id="btnGoExports">Exports</button>
-                                <button class="btn ghost" id="btnGoLogs">Logs</button>
+                            <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="btn ghost" id="btnGoItems" style="background: #fafafa;">Browse
+                                    Items</button>
+                                <button class="btn ghost" id="btnGoExports"
+                                    style="background: #fafafa;">Exports</button>
+                                <button class="btn ghost" id="btnGoLogs" style="background: #fafafa;">Logs</button>
                             </div>
                         </div>
 

@@ -21,27 +21,29 @@
                 <div class="container">
 
                     <div class="grid cols-3">
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:900;">Exports</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Download Excel/PDF reports for records and documentation.
                             </div>
                         </div>
 
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:800;">Optional Filters</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 If your backend supports query filters, they’ll be appended to export URLs.
                             </div>
 
                             <div style="display:flex; gap:10px; margin-top:10px;">
-                                <select id="fType">
+                                <select id="fType" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="">All Types</option>
                                     <option value="lost">Lost</option>
                                     <option value="found">Found</option>
                                 </select>
 
-                                <select id="fStatus">
+                                <select id="fStatus" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="">All Status</option>
                                     <option value="pending">Pending</option>
                                     <option value="matched">Matched</option>
@@ -52,7 +54,7 @@
                         </div>
 
                         <div class="card"
-                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
                                 <div style="font-weight:900;">Admin Only</div>
                                 <div style="color:var(--muted); font-size:12px;">Reports & exports</div>
@@ -61,23 +63,26 @@
                         </div>
                     </div>
 
-                    <div class="grid cols-2" style="margin-top:16px; align-items:start;">
+                    <div class="grid cols-2 animate-in stagger-2"
+                        style="margin-top:24px; align-items:start; gap: 24px;">
 
                         <!-- Items exports -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Items Report</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Items Report</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 Export all items to Excel or PDF.
                             </div>
 
-                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                            <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                                 <button class="btn primary" id="btnItemsExcel">Download Excel</button>
-                                <button class="btn ghost" id="btnItemsPdf">Open PDF</button>
+                                <button class="btn ghost" id="btnItemsPdf" style="background: #fafafa;">Open
+                                    PDF</button>
                             </div>
 
                             <div id="itemsState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
-                            <div class="card" style="margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                            <div class="card"
+                                style="margin-top:24px; padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="font-weight:800;">Notes</div>
                                 <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                     If filters don’t work yet, it will still export everything.
@@ -86,20 +91,22 @@
                         </div>
 
                         <!-- Claims exports -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Claims Report</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Claims Report</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 Export claims for auditing and release tracking.
                             </div>
 
-                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                            <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                                 <button class="btn primary" id="btnClaimsExcel">Download Excel</button>
-                                <button class="btn ghost" id="btnClaimsPdf">Open PDF</button>
+                                <button class="btn ghost" id="btnClaimsPdf" style="background: #fafafa;">Open
+                                    PDF</button>
                             </div>
 
                             <div id="claimsState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
-                            <div class="card" style="margin-top:12px; padding:12px; background:rgba(255,255,255,.04);">
+                            <div class="card"
+                                style="margin-top:24px; padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="font-weight:800;">If you don’t have claims export</div>
                                 <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                     Buttons will show a warning — you can still pass defense with Items export.
@@ -109,20 +116,22 @@
 
                     </div>
 
-                    <div class="card" style="padding:14px; margin-top:16px;">
+                    <div class="card animate-in stagger-3" style="padding:24px; margin-top:24px; background: #ffffff;">
                         <div
                             style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div>
-                                <div style="font-weight:900;">Quick Links</div>
-                                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                                <div style="font-weight:900; font-size: 20px;">Quick Links</div>
+                                <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                     Jump to other admin tools.
                                 </div>
                             </div>
 
                             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                <button class="btn ghost" id="btnGoDashboard">Dashboard</button>
-                                <button class="btn ghost" id="btnGoImports">Imports</button>
-                                <button class="btn ghost" id="btnGoLogs">Logs</button>
+                                <button class="btn ghost" id="btnGoDashboard"
+                                    style="background: #fafafa;">Dashboard</button>
+                                <button class="btn ghost" id="btnGoImports"
+                                    style="background: #fafafa;">Imports</button>
+                                <button class="btn ghost" id="btnGoLogs" style="background: #fafafa;">Logs</button>
                             </div>
                         </div>
                     </div>

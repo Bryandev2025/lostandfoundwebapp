@@ -22,23 +22,25 @@
 
                     <!-- Header row -->
                     <div class="grid cols-3">
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:900;">Claims Queue</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Review claims, approve/deny, and release items.
                             </div>
                         </div>
 
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="display:flex; gap:10px;">
-                                <select id="fStatus">
+                                <select id="fStatus" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="pending">Pending</option>
                                     <option value="approved">Approved</option>
                                     <option value="denied">Denied</option>
                                     <option value="released">Released</option>
                                     <option value="">All</option>
                                 </select>
-                                <select id="fPerPage">
+                                <select id="fPerPage" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="10">10 / page</option>
                                     <option value="20" selected>20 / page</option>
                                     <option value="50">50 / page</option>
@@ -46,44 +48,50 @@
                             </div>
 
                             <div style="display:flex; gap:10px; margin-top:10px;">
-                                <input class="input" id="fSearch"
-                                    placeholder="Search item title, claimer name, location..." />
-                                <button class="btn primary" id="btnApply">Apply</button>
+                                <input class="web-input" id="fSearch" style="background: rgba(0,0,0,0.02); margin:0;"
+                                    placeholder="Search title, name..." />
+                                <button class="btn primary" id="btnApply"
+                                    style="height: auto; padding: 0 16px;">Apply</button>
                             </div>
                         </div>
 
                         <div class="card"
-                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
-                                <div id="statsCount" style="font-weight:900;">—</div>
-                                <div style="color:var(--muted); font-size:12px;">Total claims</div>
+                                <div id="statsCount" style="font-weight:900; font-size: 24px; color: var(--brand);">—
+                                </div>
+                                <div
+                                    style="color:var(--muted); font-size:12px; font-weight: 500; text-transform: uppercase;">
+                                    Total claims</div>
                             </div>
-                            <button class="btn ghost" id="btnRefresh">Refresh</button>
+                            <button class="btn ghost" id="btnRefresh" style="background: #fafafa;">Refresh</button>
                         </div>
                     </div>
 
                     <!-- Table -->
-                    <div class="card" style="padding:14px; margin-top:16px; overflow:auto;">
+                    <div class="card animate-in stagger-2"
+                        style="padding:0; margin-top:24px; overflow:auto; background: #ffffff;">
                         <table style="width:100%; border-collapse: collapse; min-width: 980px;">
                             <thead>
-                                <tr style="text-align:left; color:var(--muted); font-size:12px;">
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Claim</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Item</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Claimer</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Status</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Submitted</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actions</th>
+                                <tr
+                                    style="text-align:left; color:var(--muted); font-size:12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0,0,0,0.02);">
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Claim</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Item</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Claimer</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Status</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Submitted</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="rows"></tbody>
                         </table>
 
                         <div
-                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;">
-                            <div id="pageInfo" style="color:var(--muted); font-size:13px;">—</div>
+                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding: 16px; border-top: 1px solid var(--border);">
+                            <div id="pageInfo" style="color:var(--muted); font-size:13px; font-weight: 500;">—</div>
                             <div style="display:flex; gap:10px;">
-                                <button class="btn ghost" id="btnPrev">Prev</button>
-                                <button class="btn ghost" id="btnNext">Next</button>
+                                <button class="btn ghost" id="btnPrev" style="background: #fafafa;">Prev</button>
+                                <button class="btn ghost" id="btnNext" style="background: #fafafa;">Next</button>
                             </div>
                         </div>
                     </div>
@@ -94,31 +102,37 @@
     </div>
 
     <!-- Modal -->
-    <div id="modalBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:1000;">
+    <div id="modalBackdrop"
+        style="position:fixed; inset:0; background:rgba(0,0,0,.15); backdrop-filter: blur(4px); display:none; z-index:1000; transition: all 0.3s ease;">
     </div>
     <div id="modal" class="card" style="
     position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(680px, calc(100vw - 32px));
-    padding:16px; display:none; z-index:1001;
+    padding:32px; display:none; z-index:1001; background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-radius: 20px;
   ">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
             <div>
-                <div id="mTitle" style="font-weight:900; font-size:16px;">—</div>
-                <div id="mSub" style="color:var(--muted); margin-top:6px; font-size:13px;">—</div>
+                <div id="mTitle" style="font-weight:900; font-size:24px; letter-spacing: -0.01em;">—</div>
+                <div id="mSub" style="color:var(--muted); margin-top:8px; font-size:15px; line-height: 1.5;">—</div>
             </div>
-            <button class="btn ghost" id="mClose">Close</button>
+            <button class="btn ghost" id="mClose"
+                style="background: #fafafa; border-radius: 50%; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center;">✕</button>
         </div>
 
-        <div class="grid" style="margin-top:12px;">
-            <textarea id="mNotes" rows="4" placeholder="Review notes (optional)"></textarea>
+        <div class="grid" style="margin-top:24px;">
+            <textarea id="mNotes" class="web-input"
+                style="background: rgba(0,0,0,0.02); resize: vertical; min-height: 100px; padding: 16px;" rows="4"
+                placeholder="Review notes (optional)"></textarea>
 
-            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="btn danger" id="mDeny">Deny</button>
-                <button class="btn success" id="mApprove">Approve</button>
-                <button class="btn primary" id="mRelease">Release</button>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; margin-top: 24px;">
+                <button class="btn ghost" id="mDeny" style="background: #fff0f0; color: #ff3b30;">Deny Claim</button>
+                <button class="btn primary" id="mApprove" style="background: #34c759; color: #fff;">Approve
+                    Claim</button>
+                <button class="btn primary" id="mRelease">Mark as Released</button>
             </div>
 
-            <div id="mState" style="color:var(--muted); font-size:13px;"></div>
+            <div id="mState" style="color:var(--muted); font-size:14px; margin-top: 12px; font-weight: 500;"></div>
         </div>
     </div>
 

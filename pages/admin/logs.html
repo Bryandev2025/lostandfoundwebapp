@@ -21,17 +21,18 @@
                 <div class="container">
 
                     <div class="grid cols-3">
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:900;">Activity Logs</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Track system actions for auditing, troubleshooting, and defense proof.
                             </div>
                         </div>
 
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:800;">Filters</div>
                             <div style="display:flex; gap:10px; margin-top:10px;">
-                                <select id="fAction">
+                                <select id="fAction" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="">All Actions</option>
                                     <option value="ITEM_CREATED">ITEM_CREATED</option>
                                     <option value="ITEM_UPDATED">ITEM_UPDATED</option>
@@ -48,7 +49,8 @@
                                     <option value="IMPORT_ITEMS">IMPORT_ITEMS</option>
                                 </select>
 
-                                <select id="fEntity">
+                                <select id="fEntity" class="web-select"
+                                    style="background: rgba(0,0,0,0.02); height: 100%;">
                                     <option value="">All Entities</option>
                                     <option value="item">item</option>
                                     <option value="claim">claim</option>
@@ -59,41 +61,48 @@
                             </div>
 
                             <div style="display:flex; gap:10px; margin-top:10px;">
-                                <input class="input" id="fSearch" placeholder="Search actor, entity_id, action..." />
-                                <button class="btn primary" id="btnApply">Apply</button>
+                                <input class="web-input" id="fSearch" style="background: rgba(0,0,0,0.02); margin:0;"
+                                    placeholder="Search actor, entity_id, action..." />
+                                <button class="btn primary" id="btnApply"
+                                    style="height: auto; padding: 0 16px;">Apply</button>
                             </div>
                         </div>
 
                         <div class="card"
-                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
-                                <div id="statsCount" style="font-weight:900;">—</div>
-                                <div style="color:var(--muted); font-size:12px;">Total logs</div>
+                                <div id="statsCount" style="font-weight:900; font-size: 24px; color: var(--brand);">—
+                                </div>
+                                <div
+                                    style="color:var(--muted); font-size:12px; font-weight: 500; text-transform: uppercase;">
+                                    Total logs</div>
                             </div>
-                            <button class="btn ghost" id="btnRefresh">Refresh</button>
+                            <button class="btn ghost" id="btnRefresh" style="background: #fafafa;">Refresh</button>
                         </div>
                     </div>
 
-                    <div class="card" style="padding:14px; margin-top:16px; overflow:auto;">
+                    <div class="card animate-in stagger-2"
+                        style="padding:0; margin-top:24px; overflow:auto; background: #ffffff;">
                         <table style="width:100%; border-collapse: collapse; min-width: 1050px;">
                             <thead>
-                                <tr style="text-align:left; color:var(--muted); font-size:12px;">
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Time</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actor</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Action</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Entity</th>
-                                    <th style="padding:10px; border-bottom:1px solid var(--border);">Meta</th>
+                                <tr
+                                    style="text-align:left; color:var(--muted); font-size:12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0,0,0,0.02);">
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Time</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Actor</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Action</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Entity</th>
+                                    <th style="padding:16px; border-bottom:1px solid var(--border);">Meta</th>
                                 </tr>
                             </thead>
                             <tbody id="rows"></tbody>
                         </table>
 
                         <div
-                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;">
-                            <div id="pageInfo" style="color:var(--muted); font-size:13px;">—</div>
+                            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding: 16px; border-top: 1px solid var(--border);">
+                            <div id="pageInfo" style="color:var(--muted); font-size:13px; font-weight: 500;">—</div>
                             <div style="display:flex; gap:10px;">
-                                <button class="btn ghost" id="btnPrev">Prev</button>
-                                <button class="btn ghost" id="btnNext">Next</button>
+                                <button class="btn ghost" id="btnPrev" style="background: #fafafa;">Prev</button>
+                                <button class="btn ghost" id="btnNext" style="background: #fafafa;">Next</button>
                             </div>
                         </div>
                     </div>

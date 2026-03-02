@@ -21,14 +21,14 @@
                 <div class="container">
 
                     <div class="grid cols-3">
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:900;">QR Tools</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 Generate item QR codes and scan tokens to load item details.
                             </div>
                         </div>
 
-                        <div class="card" style="padding:14px;">
+                        <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:800;">Tip</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
                                 You can scan using a phone camera and paste the token/URL here.
@@ -36,7 +36,7 @@
                         </div>
 
                         <div class="card"
-                            style="padding:14px; display:flex; align-items:center; justify-content:space-between;">
+                            style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
                                 <div style="font-weight:900;">Staff Area</div>
                                 <div style="color:var(--muted); font-size:12px;">QR generation & scanning</div>
@@ -45,23 +45,26 @@
                         </div>
                     </div>
 
-                    <div class="grid cols-2" style="margin-top:16px;">
+                    <div class="grid cols-2 animate-in stagger-2"
+                        style="margin-top:24px; align-items:start; gap: 24px;">
 
                         <!-- Left: Generate QR -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Generate QR</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Generate QR</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 Enter an item ID to generate its QR code.
                             </div>
 
-                            <div style="display:flex; gap:10px; margin-top:12px;">
-                                <input class="input" id="itemId" placeholder="Item ID (e.g., 12)" />
+                            <div style="display:flex; gap:10px; margin-top:20px;">
+                                <input class="web-input" id="itemId" style="background: rgba(0,0,0,0.02); margin:0;"
+                                    placeholder="Item ID (e.g., 12)" />
                                 <button class="btn primary" id="btnGenerate">Generate</button>
                             </div>
 
                             <div id="genState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
-                            <div id="qrPreviewWrap" class="card" style="padding:14px; margin-top:14px; display:none;">
+                            <div id="qrPreviewWrap" class="card"
+                                style="padding:16px; margin-top:20px; display:none; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                                     <div>
                                         <div style="font-weight:900;">QR Preview</div>
@@ -69,51 +72,59 @@
                                         </div>
                                     </div>
                                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                        <button class="btn ghost" id="btnOpenPng">Open PNG</button>
-                                        <button class="btn ghost" id="btnCopyToken">Copy Token</button>
+                                        <button class="btn ghost" id="btnOpenPng" style="background: #ffffff;">Open
+                                            PNG</button>
+                                        <button class="btn ghost" id="btnCopyToken" style="background: #ffffff;">Copy
+                                            Token</button>
                                     </div>
                                 </div>
 
-                                <div style="margin-top:12px; display:flex; justify-content:center;">
+                                <div style="margin-top:16px; display:flex; justify-content:center;">
                                     <img id="qrImg"
-                                        style="width:220px; height:220px; border-radius:16px; border:1px solid var(--border);" />
+                                        style="width:220px; height:220px; border-radius:16px; border:1px solid var(--border); background: #ffffff; padding: 10px;" />
                                 </div>
 
-                                <div style="margin-top:12px; color:var(--muted); font-size:12px;" id="qrTokenLine">
+                                <div style="margin-top:16px; color:var(--muted); font-size:12px; word-break: break-all;"
+                                    id="qrTokenLine">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Right: Scan QR -->
-                        <div class="card" style="padding:16px;">
-                            <div style="font-weight:900;">Scan QR</div>
-                            <div style="color:var(--muted); margin-top:6px; font-size:13px;">
+                        <div class="card" style="padding:24px; background: #ffffff;">
+                            <div style="font-weight:900; font-size: 20px;">Scan QR</div>
+                            <div style="color:var(--muted); margin-top:6px; font-size:14px;">
                                 Paste the QR token or full scan URL. The system will fetch the item details.
                             </div>
 
-                            <div style="display:flex; gap:10px; margin-top:12px;">
-                                <input class="input" id="scanInput"
-                                    placeholder="Token or URL (e.g., abc123 or https://.../scan/abc123)" />
+                            <div style="display:flex; gap:10px; margin-top:20px;">
+                                <input class="web-input" id="scanInput" style="background: rgba(0,0,0,0.02); margin:0;"
+                                    placeholder="Token or URL" />
                                 <button class="btn primary" id="btnScan">Scan</button>
                             </div>
 
                             <div id="scanState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
 
-                            <div id="scanResult" class="card" style="padding:14px; margin-top:14px; display:none;">
+                            <div id="scanResult" class="card"
+                                style="padding:16px; margin-top:20px; display:none; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div
                                     style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
                                     <div>
                                         <div id="rTitle" style="font-weight:900; font-size:16px;">—</div>
-                                        <div id="rSub" style="color:var(--muted); margin-top:6px;">—</div>
+                                        <div id="rSub" style="color:var(--muted); margin-top:6px; font-size: 13px;">—
+                                        </div>
                                     </div>
-                                    <button class="btn ghost" id="btnOpenItem">Open Item</button>
+                                    <button class="btn ghost" id="btnOpenItem"
+                                        style="background: #ffffff;">Open</button>
                                 </div>
 
-                                <div id="rMeta" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
+                                <div id="rMeta"
+                                    style="margin-top:12px; color:var(--muted); font-size:13px; line-height: 1.6;">
+                                </div>
 
-                                <div id="rImgWrap" style="margin-top:12px; display:none;">
+                                <div id="rImgWrap" style="margin-top:16px; display:none;">
                                     <img id="rImg"
-                                        style="width:100%; height:260px; object-fit:cover; border-radius:14px; border:1px solid var(--border);" />
+                                        style="width:100%; height:260px; object-fit:cover; border-radius:12px; border:1px solid var(--border);" />
                                 </div>
                             </div>
                         </div>

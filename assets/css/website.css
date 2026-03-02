@@ -1,45 +1,44 @@
 :root {
-  /* High-end Color Palette (Lightweight Aesthetic) */
-  --bg-dark: #000000;
-  --bg-darker: #050505;
-  --card-bg: #000000;
-  --card-border: rgba(255, 255, 255, 0.15);
-  --glass-bg: rgba(0, 0, 0, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  /* Ultra-Premium Apple-like Light Mode */
+  --bg-dark: #f5f5f7;
+  --bg-darker: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-border-hover: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.05);
 
-  --text-main: #FFFFFF;
-  --text-muted: #888888;
+  --text-main: #1d1d1f;
+  --text-muted: #86868b;
 
-  /* Minimal Accents */
-  --accent-primary: #FFFFFF;
-  --accent-secondary: #CCCCCC;
-  --accent-gradient: linear-gradient(135deg, #FFFFFF, #AAAAAA);
-  --accent-glow: rgba(255, 255, 255, 0.1);
+  /* Modern Apple Accents */
+  --accent-primary: #0066cc;
+  --accent-secondary: #007aff;
+  --accent-gradient: linear-gradient(135deg, #007aff, #005bb5);
+  --accent-glow: rgba(0, 102, 204, 0.15);
 
-  /* Status Colors (Muted) */
-  --status-pending: rgba(255, 255, 255, 0.1);
-  --status-pending-text: #AAAAAA;
-  --status-matched: rgba(255, 255, 255, 0.15);
-  --status-matched-text: #E0E0E0;
-  --status-claimed: rgba(255, 255, 255, 0.2);
-  --status-claimed-text: #FFFFFF;
+  /* Status Colors */
+  --status-pending: rgba(255, 149, 0, 0.15);
+  --status-pending-text: #ff9500;
+  --status-matched: rgba(88, 86, 214, 0.15);
+  --status-matched-text: #5856d6;
+  --status-claimed: rgba(52, 199, 89, 0.15);
+  --status-claimed-text: #28a745;
 
   /* Typography */
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
 
   /* Spacing & Layout */
-  --radius-lg: 0px;
-  /* Industrial precision */
-  --radius-md: 0px;
-  --radius-sm: 0px;
-  --btn-radius: 48px;
-  /* Pill shapes for buttons */
-  --container-width: 1280px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --btn-radius: 999px;
+  --container-width: 1240px;
 
-  /* Shadows & Effects */
-  --shadow-glow: none;
-  --shadow-glass: none;
+  /* Shadows */
+  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* Base Setup */
@@ -52,20 +51,7 @@ body.website-layout {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-}
-
-/* Grain Overlay */
-body.website-layout::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Typography Enhancements */
@@ -73,24 +59,24 @@ body.website-layout::before {
 .website-layout h2,
 .website-layout h3 {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.025em;
   margin: 0;
-  text-transform: uppercase;
 }
 
 .text-gradient {
-  color: var(--text-main);
-  /* override gradient to plain white for aesthetic */
-  background: none;
-  -webkit-text-fill-color: initial;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 /* Container */
 .web-container {
   max-width: var(--container-width);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 32px;
 }
 
 /* --- Navigation --- */
@@ -99,19 +85,15 @@ body.website-layout::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  background: transparent;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  height: 72px;
+  background: var(--glass-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--glass-border);
   z-index: 100;
   display: flex;
   align-items: center;
-  transition: background 0.3s ease;
-}
-
-.web-navbar:hover {
-  background: var(--bg-dark);
+  transition: all 0.3s ease;
 }
 
 .web-navbar .web-container {
@@ -124,16 +106,21 @@ body.website-layout::before {
 .web-brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   text-decoration: none;
   color: var(--text-main);
+  transition: opacity 0.2s;
+}
+
+.web-brand:hover {
+  opacity: 0.8;
 }
 
 .web-logo {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--text-main);
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--text-main);
   position: relative;
 }
 
@@ -142,39 +129,36 @@ body.website-layout::before {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 4px;
-  height: 4px;
-  background: var(--text-main);
+  width: 12px;
+  height: 12px;
+  background: var(--bg-dark);
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }
 
 .web-brand-text {
-  font-size: 1rem;
-  font-weight: 300;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .web-brand-text span {
-  color: var(--text-muted) !important;
+  color: var(--accent-primary);
+  font-weight: 400;
 }
 
 .web-nav-links {
   display: flex;
-  gap: 40px;
+  gap: 32px;
   align-items: center;
 }
 
 .web-nav-link {
   color: var(--text-muted);
   text-decoration: none;
-  font-weight: 300;
-  font-size: 0.75rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  transition: color 0.3s ease;
-  position: relative;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
 }
 
 .web-nav-link:hover,
@@ -185,27 +169,29 @@ body.website-layout::before {
 .web-profile-menu {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .web-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--text-muted);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 300;
-  font-size: 0.8rem;
+  font-weight: 500;
+  font-size: 0.9rem;
   color: var(--text-main);
   cursor: pointer;
-  transition: border-color 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .web-avatar:hover {
   border-color: var(--text-main);
+  transform: scale(1.05);
 }
 
 /* --- Main Layout Adjustments --- */
@@ -214,130 +200,117 @@ body.website-layout::before {
   padding-bottom: 120px;
 }
 
-/* Responsive Navbar */
-@media (max-width: 768px) {
-  .web-nav-links {
-    display: none;
-  }
-}
-
-/* --- Precision Cards --- */
+/* --- Premium Cards --- */
 .web-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 40px;
+  padding: 32px;
   position: relative;
-  transition: border-color 0.4s ease;
-}
-
-/* Crosshairs for cards */
-.web-card::before,
-.web-card::after {
-  content: '+';
-  position: absolute;
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 300;
-}
-
-.web-card::before {
-  top: 8px;
-  left: 8px;
-}
-
-.web-card::after {
-  bottom: 8px;
-  right: 8px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-glow);
+  backdrop-filter: saturate(150%) blur(20px);
 }
 
 .web-card-hoverable:hover {
-  border-color: var(--text-main);
+  border-color: var(--card-border-hover);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08), 0 0 20px rgba(0, 0, 0, 0.02);
+  background: #ffffff;
 }
 
-/* --- Precision Buttons --- */
+/* --- Premium Buttons --- */
 .web-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 14px 32px;
+  gap: 8px;
+  padding: 12px 24px;
   border-radius: var(--btn-radius);
-  font-weight: 300;
-  font-size: 0.75rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
-  background: transparent;
+  background: #ffffff;
   border: 1px solid var(--card-border);
   color: var(--text-main);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.web-btn:active {
+  transform: scale(0.96);
 }
 
 .web-btn-primary {
-  background: var(--text-main);
-  color: var(--bg-dark);
-  border: 1px solid var(--text-main);
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25);
 }
 
 .web-btn-primary:hover {
-  background: transparent;
-  color: var(--text-main);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.35);
+  transform: translateY(-2px);
 }
 
 .web-btn-glass:hover {
-  border-color: var(--text-main);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--card-border-hover);
 }
 
-/* --- Precision Inputs --- */
+/* --- Smooth Inputs --- */
 .web-input,
 .web-select {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--card-border);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
   color: var(--text-main);
-  padding: 16px 0;
-  border-radius: 0;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
   outline: none;
   font-family: inherit;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .web-input:focus,
 .web-select:focus {
-  border-color: var(--text-main);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .web-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231d1d1f'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0 center;
+  background-position: right 14px center;
   background-size: 16px;
-  padding-right: 24px;
+  padding-right: 40px;
 }
 
 .web-select option {
-  background: var(--bg-dark);
+  background: #ffffff;
   color: var(--text-main);
 }
 
-/* --- Micro-Interactions & Animations --- */
+/* --- Advanced Animations --- */
 @keyframes slideUpFade {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(30px) scale(0.98);
+    filter: blur(4px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
@@ -362,13 +335,14 @@ body.website-layout::before {
   animation-delay: 0.4s;
 }
 
-/* --- Custom File Upload Dropzone --- */
+/* --- Dropzone --- */
 .web-dropzone {
-  border: 1px dashed var(--card-border);
-  background: rgba(255, 255, 255, 0.02);
-  padding: 40px 24px;
+  border: 2px dashed var(--card-border-hover);
+  background: rgba(0, 0, 0, 0.02);
+  padding: 48px 24px;
   text-align: center;
   cursor: pointer;
+  border-radius: var(--radius-lg);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -376,8 +350,8 @@ body.website-layout::before {
 
 .web-dropzone:hover,
 .web-dropzone.dragover {
-  border-color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
 }
 
 .web-dropzone input[type="file"] {
@@ -390,23 +364,33 @@ body.website-layout::before {
   cursor: pointer;
 }
 
-/* --- Animated Background Enhancements --- */
+/* --- Background Glow Orbs --- */
 .web-bg-animated {
-  background: linear-gradient(-45deg, #10061c, #3f276e, #1c4573, #0a1121);
-  background-size: 400% 400%;
-  animation: bgGradientShift 12s ease infinite;
+  background-color: var(--bg-dark);
 }
 
-@keyframes bgGradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
+.web-bg-animated::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(0, 102, 204, 0.08) 0%, transparent 60%);
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(60px);
+}
 
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+.web-bg-animated::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(88, 86, 214, 0.08) 0%, transparent 60%);
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(60px);
 }

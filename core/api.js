@@ -2,7 +2,7 @@ import { getToken, clearAuth } from "./auth.js";
 import { toast } from "../components/toast.js";
 
 export const API = {
-    baseUrl: "https://lostandfoundsystem.test/api", // change in one place
+    baseUrl: "https://backend.test/api", // change in one place
 };
 
 async function request(path, { method = "GET", body = null, isForm = false } = {}) {

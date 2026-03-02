@@ -71,37 +71,37 @@ export function mountSidebar() {
 
   el.innerHTML = `
     <div class="brand">
-      <div class="logo"></div>
+      <div class="logo">L</div>
       <div>
-        <div class="title">Lost & Found</div>
-        <div class="subtitle">API-driven system</div>
+        <div class="title">Lost &amp; Found</div>
+        <div class="subtitle">Central System</div>
       </div>
     </div>
 
-    <div class="card" style="padding:12px; background:rgba(255,255,255,.04); border-radius:16px;">
-      <div style="display:flex; align-items:center; gap:10px;">
+    <div class="card" style="padding:14px; background:rgba(255,255,255,.02); border-radius:var(--radius); border: 1px solid var(--border); box-shadow: none;">
+      <div style="display:flex; align-items:center; gap:12px;">
         <div class="avatar">${(user?.name || "U").slice(0, 1).toUpperCase()}</div>
         <div style="min-width:0;">
-          <div style="font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          <div style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing: -0.01em;">
             ${user?.name ?? "Guest"}
           </div>
-          <div style="color:var(--muted); font-size:12px;">${role}</div>
+          <div style="color:var(--brand); font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing: 0.5px; margin-top: 2px;">${role}</div>
         </div>
       </div>
     </div>
 
-    <nav class="nav" style="margin-top:12px;">
+    <nav class="nav" style="margin-top:20px; flex: 1; overflow-y: auto;">
       ${items.map(i => navItem(i.href, i.label, path)).join("")}
     </nav>
 
     ${role !== "guest"
       ? `
-        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
-          <button class="btn ghost" id="btnLogout" style="width:100%;">Logout</button>
+        <div style="margin-top:auto; padding-top:20px;">
+          <button class="btn ghost" id="btnLogout" style="width:100%; border-radius: var(--radius-sm); color: var(--danger); font-weight: 600;">Logout</button>
         </div>
       `
       : `
-        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
+        <div style="margin-top:auto; padding-top:20px; color:var(--muted); font-size:12px; text-align: center;">
           Login to access dashboards.
         </div>
       `

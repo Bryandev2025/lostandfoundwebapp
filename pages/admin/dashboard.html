@@ -21,17 +21,24 @@
         <div class="container">
 
           <!-- Hero -->
-          <div class="card" style="padding:18px;">
-            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+          <div class="card animate-in stagger-1"
+            style="padding: 32px; position: relative; overflow: hidden; margin-bottom: 24px; border-radius: 20px;">
+            <div
+              style="position: absolute; top: 0; right: 0; bottom: 0; width: 40%; background: radial-gradient(ellipse at 100% 50%, rgba(0, 102, 204, 0.15) 0%, transparent 70%); z-index: 0; pointer-events: none;">
+            </div>
+            <div
+              style="position: relative; z-index: 1; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:center;">
               <div>
-                <div style="font-weight:950; font-size:22px; letter-spacing:.2px;">Admin Overview</div>
-                <div style="color:var(--muted); margin-top:6px;">
-                  Monitor activity, review system health, and access reports quickly.
+                <h1
+                  style="font-weight: 700; font-size: 32px; letter-spacing:-0.03em; margin: 0 0 8px 0; font-family: var(--font-display);">
+                  Admin Overview</h1>
+                <div style="color:var(--muted); font-size: 15px; max-width: 400px; line-height: 1.5;">
+                  Monitor real-time activity, review system health, and securely access administrative controls.
                 </div>
               </div>
 
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn ghost" id="btnGoLogs">View Logs</button>
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button class="btn ghost btn-glow" id="btnGoLogs">View Logs</button>
                 <button class="btn ghost" id="btnGoExports">Exports</button>
                 <button class="btn primary" id="btnGoClaims">Claims Queue</button>
               </div>
@@ -39,82 +46,134 @@
           </div>
 
           <!-- KPIs -->
-          <div class="grid cols-3" style="margin-top:16px;">
-            <div class="card" style="padding:16px;">
-              <div style="color:var(--muted); font-size:12px;">Pending Items</div>
-              <div id="kPendingItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Needs review / matching</div>
+          <div class="grid cols-3" style="margin-top: 16px; gap: 20px;">
+            <div class="card animate-in stagger-2"
+              style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Pending Items</div>
+                <div id="kPendingItems"
+                  style="font-weight: 700; font-size: 42px; font-family: var(--font-display); margin-top: 12px; letter-spacing: -1px; background: linear-gradient(135deg, #000, #555); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                  —</div>
+              </div>
+              <div style="color:var(--muted); font-size: 13px; margin-top: 16px;">Needs review / matching</div>
             </div>
 
-            <div class="card" style="padding:16px;">
-              <div style="color:var(--muted); font-size:12px;">Pending Claims</div>
-              <div id="kPendingClaims" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Waiting for staff decision</div>
+            <div class="card animate-in stagger-2"
+              style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Pending Claims</div>
+                <div id="kPendingClaims"
+                  style="font-weight: 700; font-size: 42px; font-family: var(--font-display); margin-top: 12px; letter-spacing: -1px; background: linear-gradient(135deg, #ff9500, #ffb340); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                  —</div>
+              </div>
+              <div style="color:var(--muted); font-size: 13px; margin-top: 16px;">Waiting for staff decision</div>
             </div>
 
-            <div class="card" style="padding:16px;">
-              <div style="color:var(--muted); font-size:12px;">Matched Items</div>
-              <div id="kMatchedItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Suggested/confirmed matches</div>
+            <div class="card animate-in stagger-2"
+              style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Matched Items</div>
+                <div id="kMatchedItems"
+                  style="font-weight: 700; font-size: 42px; font-family: var(--font-display); margin-top: 12px; letter-spacing: -1px; background: linear-gradient(135deg, #5856d6, #807ee1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                  —</div>
+              </div>
+              <div style="color:var(--muted); font-size: 13px; margin-top: 16px;">Suggested matches</div>
             </div>
           </div>
 
-          <div class="grid cols-3" style="margin-top:12px;">
-            <div class="card" style="padding:16px;">
-              <div style="color:var(--muted); font-size:12px;">Claimed Items</div>
-              <div id="kClaimedItems" style="font-weight:950; font-size:28px; margin-top:6px;">—</div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">Approved and collected</div>
-            </div>
-
-            <div class="card" style="padding:16px;">
-              <div style="color:var(--muted); font-size:12px;">System Status</div>
-              <div id="kSystem" style="font-weight:950; font-size:18px; margin-top:8px;">Online</div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">API reachable</div>
-            </div>
-
-            <div class="card" style="padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="grid cols-3" style="margin-top:20px; gap: 20px;">
+            <div class="card animate-in stagger-3"
+              style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
               <div>
-                <div style="color:var(--muted); font-size:12px;">Quick Actions</div>
-                <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-                  <button class="btn ghost" id="btnGoImports">Imports</button>
-                  <button class="btn ghost" id="btnGoPrints">Print Center</button>
-                  <button class="btn success" id="btnRefresh">Refresh</button>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Claimed Items</div>
+                <div id="kClaimedItems"
+                  style="font-weight: 700; font-size: 42px; font-family: var(--font-display); margin-top: 12px; letter-spacing: -1px; background: linear-gradient(135deg, #34c759, #4cd964); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                  —</div>
+              </div>
+              <div style="color:var(--muted); font-size: 13px; margin-top: 16px;">Approved and collected</div>
+            </div>
+
+            <div class="card animate-in stagger-3"
+              style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  System Status</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px;">
+                  <div
+                    style="width: 10px; height: 10px; background: #34c759; border-radius: 50%; box-shadow: 0 0 12px rgba(52, 199, 89, 0.4);">
+                  </div>
+                  <div id="kSystem" style="font-weight: 700; font-size: 24px; font-family: var(--font-display);">Online
+                  </div>
                 </div>
               </div>
-              <div style="color:var(--muted); font-size:12px; margin-top:10px;">
-                Tip: Refresh before demo to show live KPIs.
+              <div style="color:var(--muted); font-size: 13px; margin-top: 16px;">API reachable and healthy</div>
+            </div>
+
+            <div class="card animate-in stagger-3"
+              style="padding:24px; display:flex; flex-direction:column; justify-content:space-between; background: rgba(0,0,0,0.02);">
+              <div>
+                <div
+                  style="color:var(--muted); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Quick Actions</div>
+                <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+                  <button class="btn ghost" id="btnGoImports"
+                    style="font-size: 13px; padding: 10px 16px;">Imports</button>
+                  <button class="btn ghost" id="btnGoPrints" style="font-size: 13px; padding: 10px 16px;">Print
+                    Center</button>
+                  <button class="btn success" id="btnRefresh" style="font-size: 13px; padding: 10px 16px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.25 4.28" />
+                    </svg>
+                    Refresh
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Latest Activity -->
-          <div class="card" style="padding:14px; margin-top:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div class="card animate-in stagger-4" style="padding:24px; margin-top:24px; background: #ffffff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
               <div>
-                <div style="font-weight:900;">Latest Activity</div>
-                <div style="color:var(--muted); margin-top:6px; font-size:13px;">
-                  Recent actions across items, claims, matches, and QR.
+                <div
+                  style="font-weight: 700; font-size: 20px; font-family: var(--font-display); letter-spacing: -0.02em;">
+                  Latest Activity</div>
+                <div style="color:var(--muted); margin-top:6px; font-size:14px; max-width: 500px; line-height: 1.5;">
+                  Recent actions and events across the entire system.
                 </div>
               </div>
-              <button class="btn ghost" id="btnOpenLogs">Open Logs</button>
+              <button class="btn ghost" id="btnOpenLogs" style="background: #fafafa;">All Logs</button>
             </div>
 
-            <div style="margin-top:12px; overflow:auto;">
+            <div style="margin-top:20px; overflow:auto; padding-bottom: 8px;">
               <table style="width:100%; border-collapse:collapse; min-width: 980px;">
                 <thead>
-                  <tr style="text-align:left; color:var(--muted); font-size:12px;">
-                    <th style="padding:10px; border-bottom:1px solid var(--border);">Time</th>
-                    <th style="padding:10px; border-bottom:1px solid var(--border);">Actor</th>
-                    <th style="padding:10px; border-bottom:1px solid var(--border);">Action</th>
-                    <th style="padding:10px; border-bottom:1px solid var(--border);">Entity</th>
-                    <th style="padding:10px; border-bottom:1px solid var(--border);">Meta</th>
+                  <tr
+                    style="text-align:left; color:var(--muted); font-size:12px; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0,0,0,0.02);">
+                    <th style="padding:16px; border-bottom:1px solid var(--border); font-weight: 500;">Time</th>
+                    <th style="padding:16px; border-bottom:1px solid var(--border); font-weight: 500;">Actor</th>
+                    <th style="padding:16px; border-bottom:1px solid var(--border); font-weight: 500;">Action</th>
+                    <th style="padding:16px; border-bottom:1px solid var(--border); font-weight: 500;">Entity</th>
+                    <th style="padding:16px; border-bottom:1px solid var(--border); font-weight: 500;">Meta</th>
                   </tr>
                 </thead>
                 <tbody id="logRows"></tbody>
               </table>
             </div>
 
-            <div id="logHint" style="margin-top:10px; color:var(--muted); font-size:12px;"></div>
+            <div id="logHint"
+              style="margin-top:20px; color:var(--muted); font-size:13px; display: flex; align-items: center; justify-content: center; padding: 24px 0; background: rgba(0,0,0,0.02); border-radius: 12px; font-weight: 500;">
+            </div>
           </div>
 
         </div>
