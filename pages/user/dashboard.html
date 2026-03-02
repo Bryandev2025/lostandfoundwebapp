@@ -99,6 +99,11 @@
 
         document.getElementById("dashboardCards").innerHTML = cardsData.map(renderActionCard).join("");
     </script>
+
+    <script type="module">
+        import { mountFooter } from "/components/footer.js";
+        mountFooter();
+    </script>
 </body>
 
 </html>

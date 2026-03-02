@@ -231,3 +231,153 @@ textarea::placeholder {
 .stagger-4 {
   animation-delay: 0.4s;
 }
+
+/* Apple-style Footer / Minimalist Footer */
+.apple-footer {
+  background-color: #f8f8f9;
+  /* Lighter background like the screenshot */
+  color: #1d1d1f;
+  padding: 80px 24px 32px;
+  /* Substantially larger top padding for the spacious feel */
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.6;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  margin-top: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  body.dark-theme .apple-footer {
+    background-color: #121212;
+    color: #f5f5f7;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  body.dark-theme .footer-heading {
+    color: #86868b;
+  }
+
+  body.dark-theme .footer-links a,
+  body.dark-theme .footer-legal-links a,
+  body.dark-theme .footer-locale a {
+    color: #cccccc;
+  }
+
+  body.dark-theme .footer-links a:hover,
+  body.dark-theme .footer-legal-links a:hover {
+    color: #ffffff;
+  }
+
+  body.dark-theme .footer-bottom {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-theme .footer-copyright {
+    color: #86868b;
+  }
+}
+
+.footer-container {
+  max-width: var(--container);
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: flex;
+  /* Changed from grid to flex for better wrapping and grouping */
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 60px;
+  /* Space between links and bottom copyright bar */
+}
+
+/* Use a 5-column layout on desktop to match the Humblytics screenshot */
+.footer-grid.cols-5 {
+  display: flex;
+}
+
+.footer-column {
+  flex: 1;
+  min-width: 140px;
+}
+
+.footer-heading {
+  font-family: var(--font);
+  font-weight: 500;
+  /* Softer weight */
+  font-size: 13px;
+  margin: 0 0 16px;
+  color: #86868b;
+  /* Muted heading */
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  color: #1d1d1f;
+  /* Darker link text */
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity 0.2s ease;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+  /* Humblytics-style hover */
+}
+
+.footer-bottom {
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  /* Simple line separator above copyright */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #6e6e73;
+}
+
+.footer-copyright {
+  color: #6e6e73;
+  font-size: 12px;
+}
+
+.footer-icon-wrapper {
+  margin-left: auto;
+  /* Push the icon to the far right on flex rows */
+}
+
+.footer-icon {
+  width: 28px;
+  height: 28px;
+  background: #ff7b00;
+  /* Example orange color from the screenshot */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+@media (min-width: 834px) {
+  .footer-bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

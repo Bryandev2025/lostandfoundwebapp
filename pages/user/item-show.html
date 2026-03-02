@@ -228,6 +228,11 @@
         style.textContent = "@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }";
         document.head.appendChild(style);
     </script>
+
+    <script type="module">
+        import { mountFooter } from "/components/footer.js";
+        mountFooter();
+    </script>
 </body>
 
 </html>
