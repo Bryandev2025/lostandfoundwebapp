@@ -12,17 +12,21 @@ export function mountTopbar() {
   const user = getUser();
   const initial = (user?.name || "U").slice(0, 1).toUpperCase();
 
+  const isStaffOrAdmin = user?.role === "staff" || user?.role === "admin";
+  const dashboardLink = isStaffOrAdmin ? (user.role === "admin" ? "/pages/admin/dashboard.html" : "/pages/staff/dashboard.html") : "/pages/user/items.html";
+  const searchPlaceholder = isStaffOrAdmin ? "Search database... (⌘K)" : "Search lost items... (⌘K)";
+
   el.innerHTML = `
     <div style="display:flex; align-items:center; gap:16px;">
       <button class="mobileToggle" id="btnToggle" aria-label="Toggle Navigation">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
-      <div style="font-weight:700; letter-spacing:-0.01em; font-size: 18px; font-family: var(--font-display);">Dashboard</div>
+      <a href="${dashboardLink}" style="font-weight:700; letter-spacing:-0.01em; font-size: 18px; font-family: var(--font-display); text-decoration: none; color: inherit; transition: opacity 0.2s;">Dashboard</a>
     </div>
 
-    <div class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input class="input" id="globalSearch" placeholder="Search items, claims, locations..." style="font-weight: 500;" />
+    <div class="search" style="flex: 1; max-width: 420px; position:relative;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); pointer-events:none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input class="input" id="globalSearch" placeholder="${searchPlaceholder}" style="width:100%; font-weight: 500; font-size:14px; padding: 12px 16px 12px 40px; border-radius: 99px; border: 1px solid rgba(0,0,0,0.06); background: rgba(0,0,0,0.02); transition: all 0.2s ease; outline:none;" />
     </div>
 
     <div style="display: flex; gap: 16px; align-items: center;">
@@ -51,9 +55,11 @@ export function mountTopbar() {
           </div>
         </div>
 
+        ${!isStaffOrAdmin ? `
         <button class="btn primary" id="btnQuickReport" style="padding: 10px 16px; font-size: 13px; font-weight: 600; border-radius: 20px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">
           + Report Item
         </button>
+        ` : ''}
       </div>
       <div class="profile">
         <div class="avatar">${initial}</div>
@@ -97,11 +103,42 @@ export function mountTopbar() {
     });
   }
 
-  // optional search route
-  el.querySelector("#globalSearch")?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const q = e.target.value.trim();
-      if (q) window.location.href = `/pages/user/items.html?q=${encodeURIComponent(q)}`;
-    }
-  });
+  // search routing
+  const searchInput = el.querySelector("#globalSearch");
+  if (searchInput) {
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const q = e.target.value.trim();
+        const qStr = q ? `?q=${encodeURIComponent(q)}` : '';
+        if (user?.role === "staff") {
+          window.location.href = `/pages/staff/match.html${qStr}`;
+        } else if (user?.role === "admin") {
+          window.location.href = `/pages/admin/dashboard.html${qStr}`;
+        } else {
+          window.location.href = `/pages/user/items.html${qStr}`;
+        }
+      }
+    });
+
+    // global hotkey ⌘K
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    // Nice focus interactions
+    searchInput.addEventListener('focus', () => {
+      searchInput.style.background = '#ffffff';
+      searchInput.style.borderColor = 'var(--brand)';
+      searchInput.style.boxShadow = '0 0 0 4px rgba(0, 102, 204, 0.15)';
+    });
+
+    searchInput.addEventListener('blur', () => {
+      searchInput.style.background = 'rgba(0,0,0,0.02)';
+      searchInput.style.borderColor = 'rgba(0,0,0,0.06)';
+      searchInput.style.boxShadow = 'none';
+    });
+  }
 }

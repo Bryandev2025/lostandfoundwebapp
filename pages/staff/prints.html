@@ -22,25 +22,24 @@
 
                     <div class="grid cols-3">
                         <div class="card" style="padding:14px; background: #ffffff;">
-                            <div style="font-weight:900;">Print Center</div>
+                            <div style="font-weight:900;">Document Center</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
-                                Generate official PDFs for printing and export reports.
+                                Print official records and download reports.
                             </div>
                         </div>
 
                         <div class="card" style="padding:14px; background: #ffffff;">
                             <div style="font-weight:800;">How it works</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
-                                Your API returns PDF/Excel files. This page downloads as a blob and opens it in a new
-                                tab.
+                                Documents will open safely in a new browser tab for you to review before printing.
                             </div>
                         </div>
 
                         <div class="card"
                             style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
-                                <div style="font-weight:900;">Staff/Admin</div>
-                                <div style="color:var(--muted); font-size:12px;">Reports & documents</div>
+                                <div style="font-weight:900;">Staff Controls</div>
+                                <div style="color:var(--muted); font-size:12px;">Manage official files</div>
                             </div>
                             <button class="btn ghost" id="btnClear">Clear</button>
                         </div>
@@ -52,31 +51,32 @@
                         <div class="grid" style="gap:24px;">
 
                             <div class="card" style="padding:24px; background: #ffffff;">
-                                <div style="font-weight:900; font-size: 20px;">Print Item Sheet</div>
+                                <div style="font-weight:900; font-size: 20px;">Print Item Details</div>
                                 <div style="color:var(--muted); margin-top:6px; font-size:14px;">
-                                    Enter an Item ID and generate the printable item report.
+                                    Enter the Item Number below to view and print its full record.
                                 </div>
 
                                 <div style="display:flex; gap:10px; margin-top:20px;">
-                                    <input class="web-input" id="itemId" style="background: rgba(0,0,0,0.02); margin:0;"
-                                        placeholder="Item ID (e.g., 12)" />
-                                    <button class="btn primary" id="btnPrintItem">Open PDF</button>
+                                    <input class="web-input" id="itemId"
+                                        style="background: rgba(0,0,0,0.02); margin:0; padding:12px; border-radius:8px; border:1px solid var(--border);"
+                                        placeholder="Item Number (e.g. 12)" />
+                                    <button class="btn primary" id="btnPrintItem">Open Document</button>
                                 </div>
 
                                 <div id="itemState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
                             </div>
 
                             <div class="card" style="padding:24px; background: #ffffff;">
-                                <div style="font-weight:900; font-size: 20px;">Print Claim Slip</div>
+                                <div style="font-weight:900; font-size: 20px;">Print Claim Receipt</div>
                                 <div style="color:var(--muted); margin-top:6px; font-size:14px;">
-                                    Enter a Claim ID to print the release/claim slip document.
+                                    Enter the Claim Number to print a release form for a user.
                                 </div>
 
                                 <div style="display:flex; gap:10px; margin-top:20px;">
                                     <input class="web-input" id="claimId"
-                                        style="background: rgba(0,0,0,0.02); margin:0;"
-                                        placeholder="Claim ID (e.g., 4)" />
-                                    <button class="btn primary" id="btnPrintClaim">Open PDF</button>
+                                        style="background: rgba(0,0,0,0.02); margin:0; padding:12px; border-radius:8px; border:1px solid var(--border);"
+                                        placeholder="Claim Number (e.g. 4)" />
+                                    <button class="btn primary" id="btnPrintClaim">Open Document</button>
                                 </div>
 
                                 <div id="claimState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
@@ -86,40 +86,40 @@
 
                         <!-- RIGHT: Exports -->
                         <div class="card" style="padding:24px; background: #ffffff;">
-                            <div style="font-weight:900; font-size: 20px;">Exports</div>
+                            <div style="font-weight:900; font-size: 20px;">Download Data</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:14px;">
-                                Download reports for records and documentation.
+                                Save system information to your computer.
                             </div>
 
                             <div class="grid" style="margin-top:20px; gap:16px;">
 
                                 <div class="card" style="padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
-                                    <div style="font-weight:800;">Items</div>
+                                    <div style="font-weight:800;">Items Inventory</div>
                                     <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-                                        <button class="btn ghost" id="btnItemsExcel" style="background: #ffffff;">Export
-                                            Excel</button>
-                                        <button class="btn ghost" id="btnItemsPdf" style="background: #ffffff;">Export
-                                            PDF</button>
+                                        <button class="btn ghost" id="btnItemsExcel" style="background: #ffffff;">Get
+                                            Excel File</button>
+                                        <button class="btn ghost" id="btnItemsPdf" style="background: #ffffff;">Get PDF
+                                            File</button>
                                     </div>
                                 </div>
 
                                 <div class="card" style="padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
-                                    <div style="font-weight:800;">Claims</div>
+                                    <div style="font-weight:800;">Claims History</div>
                                     <div style="color:var(--muted); font-size:12px; margin-top:6px;">
-                                        If you built claim exports, enable these buttons.
+                                        Download records of all claims made.
                                     </div>
                                     <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-                                        <button class="btn ghost" id="btnClaimsExcel"
-                                            style="background: #ffffff;">Export Excel</button>
-                                        <button class="btn ghost" id="btnClaimsPdf" style="background: #ffffff;">Export
-                                            PDF</button>
+                                        <button class="btn ghost" id="btnClaimsExcel" style="background: #ffffff;">Get
+                                            Excel File</button>
+                                        <button class="btn ghost" id="btnClaimsPdf" style="background: #ffffff;">Get PDF
+                                            File</button>
                                     </div>
                                 </div>
 
                                 <div class="card" style="padding:16px; background:rgba(0,0,0,.02); box-shadow: none;">
                                     <div style="font-weight:800;">Quick Tips</div>
                                     <div style="color:var(--muted); font-size:13px; margin-top:6px;">
-                                        After the PDF opens, press <b>Ctrl + P</b> to print.
+                                        After a document opens, press <b>Ctrl + P</b> to print it.
                                     </div>
                                 </div>
 

@@ -22,24 +22,24 @@
 
                     <div class="grid cols-3">
                         <div class="card" style="padding:14px; background: #ffffff;">
-                            <div style="font-weight:900;">QR Tools</div>
+                            <div style="font-weight:900;">QR Codes</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
-                                Generate item QR codes and scan tokens to load item details.
+                                Create and read item tags.
                             </div>
                         </div>
 
                         <div class="card" style="padding:14px; background: #ffffff;">
-                            <div style="font-weight:800;">Tip</div>
+                            <div style="font-weight:800;">Need Help?</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:13px;">
-                                You can scan using a phone camera and paste the token/URL here.
+                                Scan QR codes directly with your smartphone camera.
                             </div>
                         </div>
 
                         <div class="card"
                             style="padding:14px; display:flex; align-items:center; justify-content:space-between; background: #ffffff;">
                             <div>
-                                <div style="font-weight:900;">Staff Area</div>
-                                <div style="color:var(--muted); font-size:12px;">QR generation & scanning</div>
+                                <div style="font-weight:900;">Staff Controls</div>
+                                <div style="color:var(--muted); font-size:12px;">Manage item tags</div>
                             </div>
                             <button class="btn ghost" id="btnClear">Clear</button>
                         </div>
@@ -50,15 +50,15 @@
 
                         <!-- Left: Generate QR -->
                         <div class="card" style="padding:24px; background: #ffffff;">
-                            <div style="font-weight:900; font-size: 20px;">Generate QR</div>
+                            <div style="font-weight:900; font-size: 20px;">Create Tag</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:14px;">
-                                Enter an item ID to generate its QR code.
+                                Enter the Item Number below to create a printable QR Code.
                             </div>
 
                             <div style="display:flex; gap:10px; margin-top:20px;">
-                                <input class="web-input" id="itemId" style="background: rgba(0,0,0,0.02); margin:0;"
-                                    placeholder="Item ID (e.g., 12)" />
-                                <button class="btn primary" id="btnGenerate">Generate</button>
+                                <input class="web-input" id="itemId" style="background: rgba(0,0,0,0.02); margin:0; padding:12px; border-radius:8px; border:1px solid var(--border);"
+                                    placeholder="Item Number (e.g. 12)" />
+                                <button class="btn primary" id="btnGenerate">Create</button>
                             </div>
 
                             <div id="genState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
@@ -67,15 +67,15 @@
                                 style="padding:16px; margin-top:20px; display:none; background:rgba(0,0,0,.02); box-shadow: none;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                                     <div>
-                                        <div style="font-weight:900;">QR Preview</div>
+                                        <div style="font-weight:900;">Tag Preview</div>
                                         <div id="qrMeta" style="color:var(--muted); font-size:12px; margin-top:4px;">—
                                         </div>
                                     </div>
                                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                                         <button class="btn ghost" id="btnOpenPng" style="background: #ffffff;">Open
-                                            PNG</button>
+                                            Image</button>
                                         <button class="btn ghost" id="btnCopyToken" style="background: #ffffff;">Copy
-                                            Token</button>
+                                            Code</button>
                                     </div>
                                 </div>
 
@@ -92,15 +92,15 @@
 
                         <!-- Right: Scan QR -->
                         <div class="card" style="padding:24px; background: #ffffff;">
-                            <div style="font-weight:900; font-size: 20px;">Scan QR</div>
+                            <div style="font-weight:900; font-size: 20px;">Check Tag</div>
                             <div style="color:var(--muted); margin-top:6px; font-size:14px;">
-                                Paste the QR token or full scan URL. The system will fetch the item details.
+                                Paste the scanned code here to view the item's info.
                             </div>
 
                             <div style="display:flex; gap:10px; margin-top:20px;">
-                                <input class="web-input" id="scanInput" style="background: rgba(0,0,0,0.02); margin:0;"
-                                    placeholder="Token or URL" />
-                                <button class="btn primary" id="btnScan">Scan</button>
+                                <input class="web-input" id="scanInput" style="background: rgba(0,0,0,0.02); margin:0; padding:12px; border-radius:8px; border:1px solid var(--border);"
+                                    placeholder="Scanned Code" />
+                                <button class="btn primary" id="btnScan">Check</button>
                             </div>
 
                             <div id="scanState" style="margin-top:10px; color:var(--muted); font-size:13px;"></div>
