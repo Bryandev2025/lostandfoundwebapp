@@ -234,7 +234,7 @@ textarea::placeholder {
 
 /* Apple-style Footer / Minimalist Footer */
 .apple-footer {
-  background-color: #f8f8f9;
+  background-color: transparent;
   /* Lighter background like the screenshot */
   color: #1d1d1f;
   padding: 80px 24px 32px;
@@ -248,7 +248,7 @@ textarea::placeholder {
 
 @media (prefers-color-scheme: dark) {
   body.dark-theme .apple-footer {
-    background-color: #121212;
+    background-color: transparent;
     color: #f5f5f7;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
@@ -362,16 +362,9 @@ textarea::placeholder {
 }
 
 .footer-icon {
-  width: 28px;
-  height: 28px;
-  background: #ff7b00;
-  /* Example orange color from the screenshot */
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
 }
 
 @media (min-width: 834px) {

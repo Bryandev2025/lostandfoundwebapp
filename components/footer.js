@@ -61,7 +61,7 @@ export function mountFooter() {
                         <span class="footer-copyright">© ${new Date().getFullYear()} Lost & Found Inc. All rights reserved.</span>
                     </div>
                     <div class="footer-icon-wrapper">
-                        <div class="footer-icon">L&F</div>
+                        <img class="footer-icon" src="/assets/img/lf-brand-logo.png" alt="Lost & Found" />
                     </div>
                 </div>
             </div>

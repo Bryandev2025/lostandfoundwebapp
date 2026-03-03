@@ -71,7 +71,7 @@ export function mountSidebar() {
 
   el.innerHTML = `
     <div class="brand">
-      <div class="logo" style="background-image: url('/assets/img/logo.svg'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+      <div class="logo" style="background-image: url('/assets/img/lf-brand-logo.png'); background-size: cover; background-position: center; border-radius: 8px;"></div>
       <div>
         <div class="title" style="letter-spacing: -0.01em;">Lost &amp; Found</div>
         <div class="subtitle" style="font-weight: 500;">Central System</div>
